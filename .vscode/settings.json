@@ -1,7 +1,10 @@
 {
   "cSpell.words": [
     "CDRPLATFORM",
+    "Climacrux",
     "Ewan",
+    "psycopg",
+    "runserver",
     "WHITENOISE"
   ],
   "python.formatting.provider": "black"

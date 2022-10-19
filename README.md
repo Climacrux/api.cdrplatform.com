@@ -24,6 +24,12 @@ Clone this repo and install the dependencies (info above).
 ```shell
 $ # install the pre-commit hooks
 $ poetry run pre-commit install
+
+$ # run the database migrations
+$ poetry run ./manage.py migrate
+
+$ # start the development server
+$ poetry run ./manage.py runserver
 ```
 
 ## Deployment
