@@ -137,7 +137,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-PASSWORD_HASHERS = ["cdrplatform.core.hashers.ToriiArgon2PasswordHasher"]
+PASSWORD_HASHERS = ["cdrplatform.core.hashers.CDRPlatformArgon2PasswordHasher"]
 
 
 # Internationalization
