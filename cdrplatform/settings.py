@@ -46,24 +46,50 @@ INTERNAL_IPS = env.list("INTERNAL_IPS", default=[])
 
 # Application definition
 
-INSTALLED_APPS = [
+BASE_APPS = (
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    # Use whitenoise to serve static files in development
+    "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
-]
+)
 
-MIDDLEWARE = [
+THIRD_PARTY_APPS = ("flags",)
+
+if DEBUG:
+    THIRD_PARTY_APPS = THIRD_PARTY_APPS + ("debug_toolbar",)
+
+CUSTOM_APPS = ()
+
+INSTALLED_APPS = BASE_APPS + THIRD_PARTY_APPS + CUSTOM_APPS
+
+MIDDLEWARE_INITIAL = (
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+)
+
+if DEBUG:
+    # Add debug toolbar middleware as early as possible but after anything that
+    # encodes response content
+    # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#add-the-middleware
+    MIDDLEWARE_INITIAL += ("debug_toolbar.middleware.DebugToolbarMiddleware",)
+
+MIDDLEWARE_MIDDLE = (
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
+)
+
+MIDDLEWARE_END = (
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-]
+)
+
+MIDDLEWARE = MIDDLEWARE_INITIAL + MIDDLEWARE_MIDDLE + MIDDLEWARE_END
 
 ROOT_URLCONF = "cdrplatform.urls"
 
@@ -88,13 +114,9 @@ WSGI_APPLICATION = "cdrplatform.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+DATABASES = {"default": env.db_url("DEFAULT_DB_URL")}
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
+CACHES = {"default": env.cache_url("DEFAULT_CACHE_URL")}
 
 
 # Password validation
@@ -115,25 +137,51 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+PASSWORD_HASHERS = ["cdrplatform.core.hashers.ToriiArgon2PasswordHasher"]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
-
+LANGUAGE_COOKIE_NAME = "lang"
 TIME_ZONE = "UTC"
-
 USE_I18N = True
-
+USE_L10N = True
+USE_THOUSAND_SEPARATOR = True
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
-
+STATIC_ROOT = BASE_DIR / "static"
 STATIC_URL = "static/"
+STATICFILES_DIRS = [
+    BASE_DIR / "assets",
+]
+
+
+# Whitenoise setup for serving static files
+# https://whitenoise.evans.io/en/stable/django.html
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATIC_HOST = env.str("STATIC_HOST", "")
+STATIC_URL = STATIC_HOST + "/static/"
+WHITENOISE_MAX_AGE = env.int("WHITENOISE_MAX_AGE", 120)
+WHITENOISE_KEEP_ONLY_HASHED_FILES = True
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# Email Settings
+DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL")
+SERVER_EMAIL = env.str("SERVER_EMAIL")
+
+# Securing the Django admin interface a bit through obscurity
+ENABLE_DJANGO_ADMIN = env.bool("ENABLE_DJANGO_ADMIN", False)
+DJANGO_ADMIN_PATH = env.str("DJANGO_ADMIN_PATH", "admin/").removeprefix("/")
+
+
+# CDR Platform application settings
+# ---------------------------------------------------------------------------
