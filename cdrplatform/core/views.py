@@ -1,10 +1,9 @@
-from django.http import HttpResponseNotFound, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework import serializers
-from rest_framework.parsers import JSONParser
+from django.http import JsonResponse
+from rest_framework import serializers, status
+from rest_framework.decorators import api_view
 
 
-@csrf_exempt
+@api_view(("POST",))
 def cdr_pricing(request):
     class InputSerializer(serializers.Serializer):
         weight_unit = serializers.ChoiceField(
@@ -13,10 +12,7 @@ def cdr_pricing(request):
         )
 
     if request.method == "POST":
-        data = JSONParser().parse(request)
-        serializer = InputSerializer(data=data)
+        serializer = InputSerializer(data=request.data)
         if serializer.is_valid():
-            return JsonResponse({"message": "Hello World"})
-        return JsonResponse(serializer.errors, status=400)
-
-    return HttpResponseNotFound()
+            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
