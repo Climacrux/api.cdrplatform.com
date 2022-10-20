@@ -60,6 +60,7 @@ BASE_APPS = (
 THIRD_PARTY_APPS = (
     "flags",
     "rest_framework",
+    "drf_spectacular",
 )
 
 if DEBUG:
@@ -184,6 +185,29 @@ SERVER_EMAIL = env.str("SERVER_EMAIL")
 # Securing the Django admin interface a bit through obscurity
 ENABLE_DJANGO_ADMIN = env.bool("ENABLE_DJANGO_ADMIN", False)
 DJANGO_ADMIN_PATH = env.str("DJANGO_ADMIN_PATH", "admin/").removeprefix("/")
+
+# Django rest framework setting
+# https://www.django-rest-framework.org/api-guide/settings/
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+# Django Spectacular settings
+# https://drf-spectacular.readthedocs.io/en/latest/settings.html
+SPECTACULAR_SETTINGS = {
+    "TITLE": "CDR Platform API",
+    "DESCRIPTION": """Integrate CO2 removal into your business.
+
+Fetch prices and order carbon dioxide removal from a portfolio of suppliers.""",  # noqa: W293, E501
+    "VERSION": "0.1.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "CONTACT": {
+        "name": "CDR Support",
+        "email": "help@cdrplatform.com",
+        "url": "https://cdrplatform.com/support",
+    },
+    "SWAGGER_UI_FAVICON_HREF": STATIC_URL + "favicon.ico",  # default is swagger favicon
+}
 
 
 # CDR Platform application settings

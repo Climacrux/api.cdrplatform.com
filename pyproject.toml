@@ -30,6 +30,7 @@ Pillow = "^9.2.0"
 django-flags = "^5.0.12"
 djangorestframework = "^3.14.0"
 Markdown = "^3.4.1"
+drf-spectacular = "^0.24.2"
 
 [tool.poetry.dev-dependencies]
 black = { version = "^22.8.0", allow-prereleases = true }
