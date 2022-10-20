@@ -6,7 +6,22 @@ from rest_framework.decorators import api_view
 @api_view(("POST",))
 def cdr_pricing(request):
     class BreakdownInputSerializer(serializers.Serializer):
-        forestation = serializers.IntegerField(required=False)
+        forestation = serializers.IntegerField(
+            required=False,
+            min_value=1,
+        )
+        biooil = serializers.IntegerField(
+            required=False,
+            min_value=1,
+        )
+        kelp = serializers.IntegerField(
+            required=False,
+            min_value=1,
+        )
+        olivine = serializers.IntegerField(
+            required=False,
+            min_value=1,
+        )
 
     class InputSerializer(serializers.Serializer):
         weight_unit = serializers.ChoiceField(
