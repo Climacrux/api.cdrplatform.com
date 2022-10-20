@@ -22,7 +22,7 @@ app_patterns = [
 ]
 
 other_patterns = [
-    path("accounts/", include(("django.contrib.auth.urls", "auth"))),
+    # path("accounts/", include(("django.contrib.auth.urls", "auth"))),
 ]
 if settings.ENABLE_DJANGO_ADMIN:
     other_patterns.append(
