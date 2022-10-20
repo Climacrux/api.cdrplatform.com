@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 @api_view(("POST",))
 def cdr_pricing(request):
-    class BreakdownInputSerializer(serializers.Serializer):
+    class ItemInputSerializer(serializers.Serializer):
         forestation = serializers.IntegerField(
             required=False,
             min_value=1,
@@ -28,7 +28,7 @@ def cdr_pricing(request):
             required=True,
             choices=(("g", "gram"), ("kg", "kilogram"), ("t", "tonne")),
         )
-        breakdown = BreakdownInputSerializer()
+        items = ItemInputSerializer()
 
     if request.method == "POST":
         serializer = InputSerializer(data=request.data)
