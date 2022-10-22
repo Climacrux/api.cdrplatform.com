@@ -30,6 +30,9 @@ $ poetry run ./manage.py migrate
 
 $ # start the development server
 $ poetry run ./manage.py runserver
+
+$ # Done when needing a superuser
+$ poetry run ./manage.py createsuperuser
 ```
 
 ## Deployment
