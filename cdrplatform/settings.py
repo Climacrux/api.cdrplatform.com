@@ -66,7 +66,7 @@ THIRD_PARTY_APPS = (
 if DEBUG:
     THIRD_PARTY_APPS = THIRD_PARTY_APPS + ("debug_toolbar",)
 
-CUSTOM_APPS = ()
+CUSTOM_APPS = ("cdrplatform.core",)
 
 INSTALLED_APPS = BASE_APPS + THIRD_PARTY_APPS + CUSTOM_APPS
 
@@ -142,6 +142,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 PASSWORD_HASHERS = ["cdrplatform.core.hashers.CDRPlatformArgon2PasswordHasher"]
+
+# Custom authentication
+
+AUTH_USER_MODEL = "core.CDRUser"
 
 
 # Internationalization
