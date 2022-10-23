@@ -65,10 +65,18 @@ class CDRPricing(BaseAPIView):
         methods=("POST",),
     )
     def post(self, request):
-        serializer = self.InputSerializer(data=request.data)
-        if serializer.is_valid():
-            return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        input = self.InputSerializer(data=request.data)
+        if input.is_valid():
+            # perform the calculation here
+            output = self.OutputSerializer(
+                data={
+                    "cost": 100,
+                    "currency": input.validated_data.get("currency"),
+                }
+            )
+            if output.is_valid():
+                return Response(output.data, status=status.HTTP_201_CREATED)
+        return Response(input.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CDRRemoval(BaseAPIView):
