@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import WeightChoices
+from .models import CurrencyChoices, WeightChoices
 
 
 class ItemInputSerializer(serializers.Serializer):
@@ -54,7 +54,11 @@ class CDRPricing(BaseAPIView):
 
     class OutputSerializer(serializers.Serializer):
         cost = serializers.IntegerField(min_value=0)
-        currency = serializers.CharField(min_length=3, max_length=3)
+        currency = serializers.CharField(
+            min_length=3,
+            max_length=3,
+            choices=CurrencyChoices.choices,
+        )
 
     @extend_schema(
         request=InputSerializer,
@@ -95,7 +99,11 @@ def cdr_removal_request(request):
             required=True,
             choices=WeightChoices.choices,
         )
-        currency = serializers.CharField(min_length=3, max_length=3)
+        currency = serializers.CharField(
+            min_length=3,
+            max_length=3,
+            choices=CurrencyChoices.choices,
+        )
         items = ItemInputSerializer()
 
     class OutputSerializer(serializers.Serializer):

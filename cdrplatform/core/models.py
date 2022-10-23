@@ -16,6 +16,18 @@ class WeightChoices(models.TextChoices):
     TONNE = "t", _("Tonne")
 
 
+class CurrencyChoices(models.TextChoices):
+    """Specific currencies we support.
+
+    We hard code these as they are integral to our business and if we were to
+    adopt a new currency it would likely require code changes anyway."""
+
+    CHF = "chf", "CHF"
+    USD = "usd", "USD"
+    GBP = "gbp", "GBP"
+    EUR = "eur", "EUR"
+
+
 class CDRUser(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(_("name"), max_length=150, blank=True)
     email = models.EmailField(
@@ -65,7 +77,7 @@ class PartnerPurchase(models.Model):
         max_length=2,
     )
     cdr_cost = models.PositiveIntegerField()
-    currency = models.CharField(max_length=3)
+    currency = models.CharField(max_length=3, choices=CurrencyChoices.choices)
     removal_partner = models.ForeignKey(
         "RemovalPartner",
         null=True,
@@ -83,7 +95,7 @@ class CustomerInvoice(models.Model):
     issued_date = models.DateField()
     paid_date = models.DateField(null=True)
     fees = models.PositiveIntegerField()
-    currency = models.CharField(max_length=3)
+    currency = models.CharField(max_length=3, choices=CurrencyChoices.choices)
     customer_organisation = models.ForeignKey(
         "CustomerOrganisation",
         null=True,
@@ -114,7 +126,7 @@ class RemovalPartner(models.Model):
     description = models.TextField()
     website = models.URLField()
     cost_per_tonne = models.PositiveIntegerField()
-    currency = models.CharField(max_length=3)
+    currency = models.CharField(max_length=3, choices=CurrencyChoices.choices)
 
 
 class Certificate(models.Model):
@@ -145,7 +157,7 @@ class RemovalRequest(models.Model):
     requested_datetime = models.DateTimeField(
         auto_now_add=True,  # automatically set the datetime when saving model
     )
-    currency = models.CharField(max_length=3)
+    currency = models.CharField(max_length=3, choices=CurrencyChoices.choices)
     invoice = models.ForeignKey(
         "CustomerInvoice",
         null=True,
