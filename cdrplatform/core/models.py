@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
 from django.core.mail import send_mail
@@ -53,15 +52,67 @@ class CDRUser(AbstractBaseUser, PermissionsMixin):
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
 
-class Invoice(models.Model):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET(get_sentinel_user),
+class PartnerPurchase(models.Model):
+    class WeightChoices(models.TextChoices):
+        GRAM = "g", _("Gram")
+        KILOGRAM = "kg", _("Kilogram")
+        TONNE = "t", _("Tonne")
+
+    cdr_amount = models.PositiveIntegerField()
+    cdr_unit = models.CharField(
+        choices=WeightChoices.choices,
+        max_length=2,
     )
+    cdr_cost = models.PositiveIntegerField()
+    currency = models.CharField(max_length=3)
+    removal_partner = models.ForeignKey(
+        "RemovalPartner",
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    invoice_id = models.CharField(max_length=64)
+    ordered_date = models.DateField(null=True)
+    paid_date = models.DateField(null=True)
+    completed_date = models.DateField(null=True)
+    invoice_file = models.FileField(null=True)
+
+
+class CustomerInvoice(models.Model):
     invoice_id = models.CharField(max_length=10)
     issued_date = models.DateField()
-    paid_date = models.DateField()
+    paid_date = models.DateField(null=True)
     fees = models.PositiveIntegerField()
+    currency = models.CharField(max_length=3)
+    customer_organisation = models.ForeignKey(
+        "CustomerOrganisation",
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    receiver_email = models.EmailField()
+    invoice_file = models.FileField(null=True)
+
+
+class PartnerConfirmation(models.Model):
+    partner_purchase = models.ForeignKey(
+        "PartnerPurchase",
+        on_delete=models.CASCADE,
+    )
+    confirmation_id = models.CharField(max_length=64)
+    confirmation_url = models.URLField(null=True)
+    confirmation_file = models.FileField(null=True)
+    confirmation_image = models.ImageField(null=True)
+
+
+class RemovalPartner(models.Model):
+    removal_method = models.ForeignKey(
+        "RemovalMethod",
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    partner_name = models.CharField(max_length=128)
+    description = models.TextField()
+    website = models.URLField()
+    cost_per_tonne = models.PositiveIntegerField()
     currency = models.CharField(max_length=3)
 
 
@@ -73,7 +124,16 @@ class Certificate(models.Model):
     )
     certificate_id = models.CharField(max_length=11)
     issued_date = models.DateField()
+    display_name = models.CharField(max_length=128)
+
+
+class CustomerOrganisation(models.Model):
+    organisation_name = models.CharField(max_length=64)
+
+
+class RemovalMethod(models.Model):
     name = models.CharField(max_length=128)
+    description = models.TextField()
 
 
 class RemovalRequest(models.Model):
@@ -82,24 +142,28 @@ class RemovalRequest(models.Model):
         KILOGRAM = "kg", _("Kilogram")
         TONNE = "t", _("Tonne")
 
-    requested_date = models.DateField()
-    weight_unit = models.CharField(
+    cdr_unit = models.CharField(
         choices=WeightChoices.choices,
         max_length=2,
     )
+    requested_datetime = models.DateTimeField(
+        auto_now_add=True,  # automatically set the datetime when saving model
+    )
+    currency = models.CharField(max_length=3)
     invoice = models.ForeignKey(
-        "Invoice",
+        "CustomerInvoice",
         null=True,
         on_delete=models.SET_NULL,
     )
-    currency = models.CharField(max_length=3)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET(get_sentinel_user),
+    customer_organisation = models.ForeignKey(
+        "CustomerOrganisation",
+        null=True,
+        on_delete=models.SET_NULL,
     )
-    removal_partners = models.ManyToManyField(
-        "RemovalPartner",
-        through="RemovalRequestItem",
+    uuid = models.UUIDField()
+    customer_order_id = models.CharField(
+        max_length=128,
+        blank=True,
     )
 
 
@@ -113,43 +177,9 @@ class RemovalRequestItem(models.Model):
         "RemovalRequest",
         on_delete=models.CASCADE,
     )
-    cost = models.PositiveIntegerField()
-    amount = models.PositiveIntegerField()
-
-
-class PartnerCertificate(models.Model):
-    removal_partner = models.ForeignKey(
-        "RemovalPartner",
-        null=True,
-        on_delete=models.SET_NULL,
-    )
-    removal_request = models.ForeignKey(
-        "RemovalRequest",
-        null=True,
-        on_delete=models.SET_NULL,
-    )
-    certificate_id = models.CharField(max_length=64)
-    issued_date = models.DateField()
-    name = models.CharField(max_length=128)
-    removal_request_item = models.ForeignKey(
-        "RemovalRequestItem",
-        null=True,
-        on_delete=models.SET_NULL,
-    )
-
-
-class RemovalPartner(models.Model):
-    removal_method = models.ForeignKey(
-        "RemovalMethod",
-        null=True,
-        on_delete=models.SET_NULL,
-    )
-    name = models.CharField(max_length=128)
-    description = models.TextField()
-    website = models.URLField()
-    cost_per_tonne = models.PositiveIntegerField()
-    currency = models.CharField(max_length=3)
-
-
-class RemovalMethod(models.Model):
-    name = models.CharField(max_length=128)
+    # cost in smallest denomination of :class:`RemovalRequest` currency
+    # e.g. in cents for USD; rappen for CHF etc; pence for GBP etc.
+    cdr_cost = models.PositiveIntegerField()
+    # amount of CDR in unit defined in related :class:`RemovalRequest`
+    # e.g. 5t; 100g; 500kg; etc.
+    cdr_amount = models.PositiveIntegerField()
