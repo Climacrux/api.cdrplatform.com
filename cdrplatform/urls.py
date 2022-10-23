@@ -21,7 +21,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 app_patterns = [
     path("v1/", include("cdrplatform.core.urls", namespace="v1")),
     # path("v2/", include("cdrplatform.core.urls", namespace="v2")),
-    path("schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("schema/", SpectacularAPIView.as_view(api_version="v1"), name="schema"),
     path(
         "schema/swagger-ui/",
         SpectacularSwaggerView.as_view(url_name="schema"),
