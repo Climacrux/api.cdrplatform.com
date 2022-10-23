@@ -43,8 +43,9 @@ class CDRPricing(BaseAPIView):
             required=True,
             choices=WeightChoices.choices,
         )
-        # todo: add validation on currency
-        currency = serializers.CharField(min_length=3, max_length=3)
+        currency = serializers.ChoiceField(
+            choices=CurrencyChoices.choices,
+        )
         items = ItemInputSerializer()
         # Whether or not the fees should be
         include_fees = serializers.BooleanField(
@@ -54,9 +55,7 @@ class CDRPricing(BaseAPIView):
 
     class OutputSerializer(serializers.Serializer):
         cost = serializers.IntegerField(min_value=0)
-        currency = serializers.CharField(
-            min_length=3,
-            max_length=3,
+        currency = serializers.ChoiceField(
             choices=CurrencyChoices.choices,
         )
 
@@ -99,9 +98,7 @@ def cdr_removal_request(request):
             required=True,
             choices=WeightChoices.choices,
         )
-        currency = serializers.CharField(
-            min_length=3,
-            max_length=3,
+        currency = serializers.ChoiceField(
             choices=CurrencyChoices.choices,
         )
         items = ItemInputSerializer()
