@@ -10,6 +10,12 @@ def get_sentinel_user():
     return get_user_model().objects.get_or_create(username="DELETED")[0]
 
 
+class WeightChoices(models.TextChoices):
+    GRAM = "g", _("Gram")
+    KILOGRAM = "kg", _("Kilogram")
+    TONNE = "t", _("Tonne")
+
+
 class CDRUser(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(_("name"), max_length=150, blank=True)
     email = models.EmailField(
@@ -53,11 +59,6 @@ class CDRUser(AbstractBaseUser, PermissionsMixin):
 
 
 class PartnerPurchase(models.Model):
-    class WeightChoices(models.TextChoices):
-        GRAM = "g", _("Gram")
-        KILOGRAM = "kg", _("Kilogram")
-        TONNE = "t", _("Tonne")
-
     cdr_amount = models.PositiveIntegerField()
     cdr_unit = models.CharField(
         choices=WeightChoices.choices,
@@ -137,11 +138,6 @@ class RemovalMethod(models.Model):
 
 
 class RemovalRequest(models.Model):
-    class WeightChoices(models.TextChoices):
-        GRAM = "g", _("Gram")
-        KILOGRAM = "kg", _("Kilogram")
-        TONNE = "t", _("Tonne")
-
     cdr_unit = models.CharField(
         choices=WeightChoices.choices,
         max_length=2,
