@@ -1,6 +1,5 @@
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, extend_schema_serializer
 from rest_framework import serializers, status
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -27,10 +26,7 @@ class ItemInputSerializer(serializers.Serializer):
 
 
 class BaseAPIView(APIView):
-    """A base API View class for all Views to inherit from.
-
-    Can contain any shared logic of functions.
-    """
+    pass
 
 
 class CDRPricing(BaseAPIView):
@@ -38,6 +34,7 @@ class CDRPricing(BaseAPIView):
     CDR items.
     """
 
+    @extend_schema_serializer(component_name="PricingRequestInput")
     class InputSerializer(serializers.Serializer):
         weight_unit = serializers.ChoiceField(
             required=True,
@@ -53,6 +50,7 @@ class CDRPricing(BaseAPIView):
             default=False,
         )
 
+    @extend_schema_serializer(component_name="PricingRequestOutput")
     class OutputSerializer(serializers.Serializer):
         cost = serializers.IntegerField(min_value=0)
         currency = serializers.ChoiceField(
@@ -73,26 +71,12 @@ class CDRPricing(BaseAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(("POST",))
-def cdr_removal_request(request):
-    class ItemInputSerializer(serializers.Serializer):
-        forestation = serializers.IntegerField(
-            required=False,
-            min_value=1,
-        )
-        biooil = serializers.IntegerField(
-            required=False,
-            min_value=1,
-        )
-        kelp = serializers.IntegerField(
-            required=False,
-            min_value=1,
-        )
-        olivine = serializers.IntegerField(
-            required=False,
-            min_value=1,
-        )
+class CDRRemoval(BaseAPIView):
+    """Order and commit to purchasing carbon dioxide removal for a given portfolio of
+    CDR items.
+    """
 
+    @extend_schema_serializer(component_name="RemovalRequestInput")
     class InputSerializer(serializers.Serializer):
         weight_unit = serializers.ChoiceField(
             required=True,
@@ -102,9 +86,22 @@ def cdr_removal_request(request):
             choices=CurrencyChoices.choices,
         )
         items = ItemInputSerializer()
+        # Whether or not the fees should be
+        include_fees = serializers.BooleanField(
+            required=False,
+            default=False,
+        )
 
+    @extend_schema_serializer(component_name="RemovalRequestOutput")
     class OutputSerializer(serializers.Serializer):
-        request_id = serializers.UUIDField()
+        transaction_uuid = serializers.UUIDField()
 
-    if request.method == "POST":
+    @extend_schema(
+        request=InputSerializer,
+        responses={
+            status.HTTP_201_CREATED: OutputSerializer,
+        },
+        methods=("POST",),
+    )
+    def post(self, request):
         return Response({"foo": request.version})
