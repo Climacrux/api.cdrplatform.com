@@ -69,13 +69,12 @@ class CDRPricing(BaseAPIView):
         if input.is_valid():
             # perform the calculation here
             output = self.OutputSerializer(
-                data={
+                {
                     "cost": 100,
                     "currency": input.validated_data.get("currency"),
                 }
             )
-            if output.is_valid():
-                return Response(output.data, status=status.HTTP_201_CREATED)
+            return Response(output.data, status=status.HTTP_201_CREATED)
         return Response(input.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
