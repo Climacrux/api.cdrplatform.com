@@ -194,6 +194,7 @@ DJANGO_ADMIN_PATH = env.str("DJANGO_ADMIN_PATH", "admin/").removeprefix("/")
 # https://www.django-rest-framework.org/api-guide/settings/
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
 }
 
 # Django Spectacular settings

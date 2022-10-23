@@ -19,7 +19,8 @@ from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 app_patterns = [
-    path("", include("cdrplatform.core.urls")),
+    path("v1/", include("cdrplatform.core.urls", namespace="v1")),
+    # path("v2/", include("cdrplatform.core.urls", namespace="v2")),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "schema/swagger-ui/",

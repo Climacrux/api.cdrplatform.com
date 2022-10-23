@@ -1,10 +1,16 @@
-from django.urls import path
+from django.urls import include, path
 
 from .views import cdr_pricing
 
+app_name = "core"
+
+cdr_routes = [
+    path("price/", cdr_pricing),
+]
+
 urlpatterns = [
     path(
-        "v1/cdr/price",
-        cdr_pricing,
+        "cdr/",
+        include(cdr_routes),
     )
 ]
