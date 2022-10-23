@@ -66,7 +66,10 @@ class CDRPricing(BaseAPIView):
     )
     def post(self, request):
         input = self.InputSerializer(data=request.data)
-        if input.is_valid():
+        # We raise an exception if the data is invalid because it will be automatically
+        # caught and handled by drf-standardized-errors.
+        # This means it will have the same error format as every other error 👍
+        if input.is_valid(raise_exception=True):
             # perform the calculation here
             output = self.OutputSerializer(
                 {
@@ -75,7 +78,6 @@ class CDRPricing(BaseAPIView):
                 }
             )
             return Response(output.data, status=status.HTTP_201_CREATED)
-        return Response(input.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CDRRemoval(BaseAPIView):
