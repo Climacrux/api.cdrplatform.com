@@ -61,6 +61,7 @@ THIRD_PARTY_APPS = (
     "flags",
     "rest_framework",
     "drf_spectacular",
+    "drf_standardized_errors",
 )
 
 if DEBUG:
@@ -193,8 +194,9 @@ DJANGO_ADMIN_PATH = env.str("DJANGO_ADMIN_PATH", "admin/").removeprefix("/")
 # Django rest framework setting
 # https://www.django-rest-framework.org/api-guide/settings/
 REST_FRAMEWORK = {
-    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_SCHEMA_CLASS": "drf_standardized_errors.openapi.AutoSchema",
     "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
+    "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler",
 }
 
 APPEND_SLASH = True
@@ -214,6 +216,24 @@ Fetch prices and order carbon dioxide removal from a portfolio of suppliers.""",
         "url": "https://cdrplatform.com/support",
     },
     "SWAGGER_UI_FAVICON_HREF": STATIC_URL + "favicon.ico",  # default is swagger favicon
+    # Used by drf_standardized_errors
+    # https://drf-standardized-errors.readthedocs.io/en/latest/openapi.html
+    "ENUM_NAME_OVERRIDES": {
+        "ValidationErrorEnum": "drf_standardized_errors.openapi_serializers.ValidationErrorEnum.values",  # noqa: E501
+        "ClientErrorEnum": "drf_standardized_errors.openapi_serializers.ClientErrorEnum.values",  # noqa: E501
+        "ServerErrorEnum": "drf_standardized_errors.openapi_serializers.ServerErrorEnum.values",  # noqa: E501
+        "ErrorCode401Enum": "drf_standardized_errors.openapi_serializers.ErrorCode401Enum.values",  # noqa: E501
+        "ErrorCode403Enum": "drf_standardized_errors.openapi_serializers.ErrorCode403Enum.values",  # noqa: E501
+        "ErrorCode404Enum": "drf_standardized_errors.openapi_serializers.ErrorCode404Enum.values",  # noqa: E501
+        "ErrorCode405Enum": "drf_standardized_errors.openapi_serializers.ErrorCode405Enum.values",  # noqa: E501
+        "ErrorCode406Enum": "drf_standardized_errors.openapi_serializers.ErrorCode406Enum.values",  # noqa: E501
+        "ErrorCode415Enum": "drf_standardized_errors.openapi_serializers.ErrorCode415Enum.values",  # noqa: E501
+        "ErrorCode429Enum": "drf_standardized_errors.openapi_serializers.ErrorCode429Enum.values",  # noqa: E501
+        "ErrorCode500Enum": "drf_standardized_errors.openapi_serializers.ErrorCode500Enum.values",  # noqa: E501
+    },
+    "POSTPROCESSING_HOOKS": [
+        "drf_standardized_errors.openapi_hooks.postprocess_schema_enums"
+    ],
 }
 
 
