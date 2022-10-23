@@ -35,3 +35,9 @@ def cdr_pricing(request):
         if serializer.is_valid():
             return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(("POST",))
+def cdr_removal_request(request):
+    if request.method == "POST":
+        return Response({"foo": request.version})
