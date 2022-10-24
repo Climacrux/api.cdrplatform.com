@@ -1,3 +1,5 @@
+import functools
+
 from drf_spectacular.utils import extend_schema, extend_schema_serializer
 from rest_framework import serializers, status
 from rest_framework.response import Response
@@ -43,9 +45,19 @@ class CDRPricingView(BaseAPIView):
 
     @extend_schema_serializer(component_name="PricingRequestOutput")
     class OutputSerializer(serializers.Serializer):
-        cost = serializers.IntegerField(min_value=0)
+        class CostSerializer(serializers.Serializer):
+            items = serializers.ListField()
+            removal = serializers.IntegerField()
+            variable_fees = serializers.IntegerField()
+            total = serializers.IntegerField()
+
+        cost = CostSerializer()
         currency = serializers.ChoiceField(
             choices=CurrencyChoices.choices,
+        )
+        weight_unit = serializers.ChoiceField(
+            required=True,
+            choices=WeightChoices.choices,
         )
 
     @extend_schema(
@@ -62,10 +74,25 @@ class CDRPricingView(BaseAPIView):
         # This means it will have the same error format as every other error 👍
         if input.is_valid(raise_exception=True):
             # todo: perform the calculation here
+            # removal_items = input.validated_data.get("items")
+
+            items = [
+                {"method_type": "forestation", "amount": 10, "cost": 100},
+                {"method_type": "biooil", "amount": 10, "cost": 100},
+            ]
+            removal_cost = functools.reduce(lambda x, y: x + y["cost"], items, 0)
+            variable_fees = 200
+
             output = self.OutputSerializer(
                 {
-                    "cost": 100,
+                    "cost": {
+                        "items": items,
+                        "removal": removal_cost,
+                        "variable_fees": variable_fees,
+                        "total": removal_cost + variable_fees,
+                    },
                     "currency": input.validated_data.get("currency"),
+                    "weight_unit": input.validated_data.get("weight_unit"),
                 }
             )
             return Response(output.data, status=status.HTTP_201_CREATED)
