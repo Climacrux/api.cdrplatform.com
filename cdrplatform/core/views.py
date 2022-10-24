@@ -1,5 +1,6 @@
 import collections
 import functools
+import math
 from typing import Iterable
 
 from django.utils.functional import lazy
@@ -8,6 +9,7 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .data import FEES
 from .models import CurrencyChoices, RemovalPartner, WeightChoices
 
 
@@ -112,15 +114,17 @@ class CDRPricingView(BaseAPIView):
 
             items = list(map(calculate_cost, input.validated_data.get("items")))
             removal_cost = functools.reduce(lambda x, y: x + y["cost"], items, 0)
-            variable_fees = 200
+            variable_fee = math.ceil(
+                FEES["climacrux"]["variable_pct"] * removal_cost / 100
+            )
 
             output = self.OutputSerializer(
                 {
                     "cost": {
                         "items": items,
                         "removal": removal_cost,
-                        "variable_fees": variable_fees,
-                        "total": removal_cost + variable_fees,
+                        "variable_fees": variable_fee,
+                        "total": removal_cost + variable_fee,
                     },
                     "currency": input.validated_data.get("currency"),
                     "weight_unit": input.validated_data.get("weight_unit"),
