@@ -17,7 +17,7 @@ class InputRemovalMethodSerializer(serializers.Serializer):
             ("dacs", "dacs"),
             ("olivine", "olivine"),
             ("kelp", "kelp"),
-            ("biooil", "biooil"),
+            ("bio-oil", "bio-oil"),
         ),
     )
     amount = serializers.IntegerField(required=True, min_value=1)
@@ -87,9 +87,16 @@ class CDRPricingView(BaseAPIView):
 
             def calculate_cost(element):
                 partner = RemovalPartner.objects.get(
-                    removal_method__name=element["method_type"]
+                    removal_method__slug=element["method_type"]
                 )
-                element["cost"] = partner.cost_per_tonne
+                if input.validated_data["weight_unit"] == "t":
+                    amount_g = element["amount"] * 1000 * 1000
+                elif input.validated_data["weight_unit"] == "kg":
+                    amount_g = element["amount"] * 1000
+                else:
+                    amount_g = element["amount"]
+
+                element["cost"] = int(partner.cost_per_tonne * amount_g / (1000 * 1000))
                 return element
 
             items = list(map(calculate_cost, input.validated_data.get("items")))
