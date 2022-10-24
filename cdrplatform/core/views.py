@@ -29,7 +29,7 @@ class BaseAPIView(APIView):
     pass
 
 
-class CDRPricing(BaseAPIView):
+class CDRPricingView(BaseAPIView):
     """Calculate a carbon dioxide removal price for a given portfolio of
     CDR items.
     """
@@ -41,6 +41,7 @@ class CDRPricing(BaseAPIView):
             choices=WeightChoices.choices,
         )
         currency = serializers.ChoiceField(
+            required=True,
             choices=CurrencyChoices.choices,
         )
         items = ItemInputSerializer()

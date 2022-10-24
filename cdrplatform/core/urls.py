@@ -1,11 +1,11 @@
 from django.urls import include, path
 
-from .views import CDRPricing, CDRRemoval
+from .views import CDRPricingView, CDRRemoval
 
 app_name = "core"
 
 cdr_routes = [
-    path("price/", CDRPricing.as_view(), name="cdr_price"),
+    path("price/", CDRPricingView.as_view(), name="cdr_price"),
     path("", CDRRemoval.as_view(), name="cdr_request"),
 ]
 
