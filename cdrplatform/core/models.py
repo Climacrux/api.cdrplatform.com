@@ -124,11 +124,15 @@ class RemovalPartner(models.Model):
         null=True,
         on_delete=models.SET_NULL,
     )
-    partner_name = models.CharField(max_length=128)
+    name = models.CharField(max_length=128)
+    slug = models.SlugField(unique=True)
     description = models.TextField()
     website = models.URLField()
     cost_per_tonne = models.PositiveIntegerField()
     currency = models.CharField(max_length=3, choices=CurrencyChoices.choices)
+
+    def __str__(self) -> str:
+        return f"{self.pk} - {self.name}"
 
 
 class Certificate(models.Model):
@@ -148,6 +152,7 @@ class CustomerOrganisation(models.Model):
 
 class RemovalMethod(models.Model):
     name = models.CharField(max_length=128)
+    slug = models.SlugField(unique=True)
     description = models.TextField()
 
     def __str__(self) -> str:
