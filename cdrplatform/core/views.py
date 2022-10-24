@@ -1,6 +1,8 @@
 import collections
 import functools
+from typing import Iterable
 
+from django.utils.functional import lazy
 from drf_spectacular.utils import extend_schema, extend_schema_serializer
 from rest_framework import serializers, status
 from rest_framework.response import Response
@@ -9,16 +11,25 @@ from rest_framework.views import APIView
 from .models import CurrencyChoices, RemovalPartner, WeightChoices
 
 
+def removal_partner_list() -> Iterable[RemovalPartner]:
+    return RemovalPartner.objects.all()
+
+
+def removal_method_choices():
+    try:
+        _partners = [
+            (m.removal_method.slug, m.removal_method.name)
+            for m in removal_partner_list().select_related("removal_method")
+        ]
+    except Exception:
+        _partners = tuple(tuple())
+    return _partners
+
+
 class InputRemovalMethodSerializer(serializers.Serializer):
     method_type = serializers.ChoiceField(
         required=True,
-        choices=(
-            ("forestation", "forestation"),
-            ("dacs", "dacs"),
-            ("olivine", "olivine"),
-            ("kelp", "kelp"),
-            ("bio-oil", "bio-oil"),
-        ),
+        choices=lazy(removal_method_choices, tuple)(),
     )
     amount = serializers.IntegerField(required=True, min_value=1)
 
