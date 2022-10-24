@@ -6,23 +6,18 @@ from rest_framework.views import APIView
 from .models import CurrencyChoices, WeightChoices
 
 
-class ItemInputSerializer(serializers.Serializer):
-    forestation = serializers.IntegerField(
-        required=False,
-        min_value=1,
+class InputRemovalMethodSerializer(serializers.Serializer):
+    method_type = serializers.ChoiceField(
+        required=True,
+        choices=(
+            ("forestation", "forestation"),
+            ("dacs", "dacs"),
+            ("olivine", "olivine"),
+            ("kelp", "kelp"),
+            ("biooil", "biooil"),
+        ),
     )
-    biooil = serializers.IntegerField(
-        required=False,
-        min_value=1,
-    )
-    kelp = serializers.IntegerField(
-        required=False,
-        min_value=1,
-    )
-    olivine = serializers.IntegerField(
-        required=False,
-        min_value=1,
-    )
+    amount = serializers.IntegerField(required=True, min_value=1)
 
 
 class BaseAPIView(APIView):
@@ -44,12 +39,7 @@ class CDRPricingView(BaseAPIView):
             required=True,
             choices=CurrencyChoices.choices,
         )
-        items = ItemInputSerializer()
-        # Whether or not the fees should be
-        include_fees = serializers.BooleanField(
-            required=False,
-            default=False,
-        )
+        items = InputRemovalMethodSerializer(many=True, min_length=1)
 
     @extend_schema_serializer(component_name="PricingRequestOutput")
     class OutputSerializer(serializers.Serializer):
@@ -71,7 +61,7 @@ class CDRPricingView(BaseAPIView):
         # caught and handled by drf-standardized-errors.
         # This means it will have the same error format as every other error 👍
         if input.is_valid(raise_exception=True):
-            # perform the calculation here
+            # todo: perform the calculation here
             output = self.OutputSerializer(
                 {
                     "cost": 100,
@@ -95,7 +85,7 @@ class CDRRemoval(BaseAPIView):
         currency = serializers.ChoiceField(
             choices=CurrencyChoices.choices,
         )
-        items = ItemInputSerializer()
+        items = InputRemovalMethodSerializer(many=True)
         # Whether or not the fees should be
         include_fees = serializers.BooleanField(
             required=False,
