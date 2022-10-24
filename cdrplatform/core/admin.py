@@ -1,3 +1,8 @@
-# from django.contrib import admin
+from django.contrib import admin
 
-# Register your models here.
+from cdrplatform.core.models import RemovalMethod
+
+
+@admin.register(RemovalMethod)
+class RemovalMethodAdmin(admin.ModelAdmin):
+    pass
