@@ -150,6 +150,9 @@ class RemovalMethod(models.Model):
     name = models.CharField(max_length=128)
     description = models.TextField()
 
+    def __str__(self) -> str:
+        return f"{self.pk} - {self.name}"
+
 
 class RemovalRequest(models.Model):
     cdr_unit = models.CharField(
