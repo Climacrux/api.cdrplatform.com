@@ -6,7 +6,7 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import CurrencyChoices, WeightChoices
+from .models import CurrencyChoices, RemovalPartner, WeightChoices
 
 
 class InputRemovalMethodSerializer(serializers.Serializer):
@@ -86,8 +86,10 @@ class CDRPricingView(BaseAPIView):
             # todo: perform the calculation here
 
             def calculate_cost(element):
-                element["method_type"]
-                element["cost"] = 5
+                partner = RemovalPartner.objects.get(
+                    removal_method__name=element["method_type"]
+                )
+                element["cost"] = partner.cost_per_tonne
                 return element
 
             items = list(map(calculate_cost, input.validated_data.get("items")))
