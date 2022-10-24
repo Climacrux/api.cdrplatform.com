@@ -1,3 +1,4 @@
+import collections
 import functools
 
 from drf_spectacular.utils import extend_schema, extend_schema_serializer
@@ -43,6 +44,15 @@ class CDRPricingView(BaseAPIView):
         )
         items = InputRemovalMethodSerializer(many=True, min_length=1)
 
+        def validate_items(self, value):
+            counter = collections.Counter(map(lambda x: x["method_type"], value))
+            for key in counter:
+                if counter[key] > 1:
+                    raise serializers.ValidationError(
+                        f'"{key}" can not appear more than once in items.'
+                    )
+            return value
+
     @extend_schema_serializer(component_name="PricingRequestOutput")
     class OutputSerializer(serializers.Serializer):
         class CostSerializer(serializers.Serializer):
@@ -74,12 +84,13 @@ class CDRPricingView(BaseAPIView):
         # This means it will have the same error format as every other error 👍
         if input.is_valid(raise_exception=True):
             # todo: perform the calculation here
-            # removal_items = input.validated_data.get("items")
 
-            items = [
-                {"method_type": "forestation", "amount": 10, "cost": 100},
-                {"method_type": "biooil", "amount": 10, "cost": 100},
-            ]
+            def calculate_cost(element):
+                element["method_type"]
+                element["cost"] = 5
+                return element
+
+            items = list(map(calculate_cost, input.validated_data.get("items")))
             removal_cost = functools.reduce(lambda x, y: x + y["cost"], items, 0)
             variable_fees = 200
 
