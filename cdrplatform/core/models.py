@@ -1,9 +1,11 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.core.mail import send_mail
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
+from cdrplatform.core.managers import CDRUserManager
 
 
 def get_sentinel_user():
@@ -52,7 +54,7 @@ class CDRUser(AbstractBaseUser, PermissionsMixin):
     )
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
 
-    objects = UserManager()
+    objects = CDRUserManager()
 
     EMAIL_FIELD = "email"
     USERNAME_FIELD = "email"
