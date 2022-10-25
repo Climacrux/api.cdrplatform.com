@@ -151,6 +151,9 @@ class Certificate(models.Model):
 class CustomerOrganisation(models.Model):
     organisation_name = models.CharField(max_length=64)
 
+    def __str__(self) -> str:
+        return f"{self.organisation_name}"
+
 
 class RemovalMethod(models.Model):
     name = models.CharField(max_length=128)
@@ -190,6 +193,9 @@ class RemovalRequest(models.Model):
         blank=True,
     )
 
+    def __str__(self) -> str:
+        return f"{self.uuid}"
+
 
 class RemovalRequestItem(models.Model):
     removal_partner = models.ForeignKey(
@@ -207,6 +213,9 @@ class RemovalRequestItem(models.Model):
     # amount of CDR in unit defined in related :class:`RemovalRequest`
     # e.g. 5t; 100g; 500kg; etc.
     cdr_amount = models.PositiveIntegerField()
+
+    def __str__(self) -> str:
+        return f"{self.pk}"
 
 
 class CurrencyConversionRate(models.Model):
