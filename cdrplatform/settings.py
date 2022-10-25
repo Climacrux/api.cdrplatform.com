@@ -196,8 +196,9 @@ DJANGO_ADMIN_PATH = env.str("DJANGO_ADMIN_PATH", "admin/").removeprefix("/")
 # https://www.django-rest-framework.org/api-guide/settings/
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_standardized_errors.openapi.AutoSchema",
-    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
     "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler",
+    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
+    "TEST_REQUEST_DEFAULT_FORMAT": "json",  # Use JSON by default in tests
 }
 
 APPEND_SLASH = True
