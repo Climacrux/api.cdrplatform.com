@@ -60,6 +60,7 @@ BASE_APPS = (
 THIRD_PARTY_APPS = (
     "flags",
     "rest_framework",
+    "rest_framework_api_key",
     "drf_spectacular",
     "drf_standardized_errors",
 )

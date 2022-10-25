@@ -1,8 +1,10 @@
 from django.contrib import admin
+from rest_framework_api_key.admin import APIKeyModelAdmin
 
 from cdrplatform.core.models import (
     CurrencyConversionRate,
     CustomerOrganisation,
+    OrganisationAPIKey,
     RemovalMethod,
     RemovalPartner,
     RemovalRequest,
@@ -61,3 +63,8 @@ class RemovalRequestItemAdmin(admin.ModelAdmin):
 @admin.register(CustomerOrganisation)
 class CustomerOrganisationAdmin(admin.ModelAdmin):
     list_display = ("organisation_name",)
+
+
+@admin.register(OrganisationAPIKey)
+class OrganisationAPIKeyAdmin(APIKeyModelAdmin):
+    pass

@@ -6,6 +6,7 @@ from django.core.mail import send_mail
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from rest_framework_api_key.models import AbstractAPIKey
 
 from cdrplatform.core.managers import CDRUserManager
 
@@ -232,3 +233,16 @@ class CurrencyConversionRate(models.Model):
             f"{self.from_currency} to {self.to_currency}"
             + f" - {self.date_time.strftime('%Y-%m-%d')}"
         )
+
+
+class OrganisationAPIKey(AbstractAPIKey):
+    """Create special API keys that are connected to a :class:`CustomerOrganisation`.
+
+    This is how we will tie API requests to an Organisation for billing.
+    """
+
+    organisation = models.ForeignKey(
+        CustomerOrganisation,
+        on_delete=models.CASCADE,
+        related_name="api_keys",
+    )
