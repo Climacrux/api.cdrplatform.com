@@ -143,7 +143,9 @@ class CDRRemovalViewTestCase(APITestCase):
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        uuid.UUID(response.data["transaction_uuid"])
+        uuid.UUID(
+            response.data["transaction_uuid"]
+        )  # this will raise an exception if not a valid UUID
 
     def test_invalid_carbon_removal_request(self):
         """
@@ -186,4 +188,6 @@ class CDRRemovalViewTestCase(APITestCase):
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        uuid.UUID(response.data["transaction_uuid"])
+        uuid.UUID(
+            response.data["transaction_uuid"]
+        )  # this will raise an exception if not a valid UUID
