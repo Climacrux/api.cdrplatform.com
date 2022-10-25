@@ -183,11 +183,6 @@ class CDRRemoval(BaseAPIView):
             choices=CurrencyChoices.choices,
         )
         items = InputRemovalMethodSerializer(many=True)
-        # Whether or not the fees should be
-        include_fees = serializers.BooleanField(
-            required=False,
-            default=False,
-        )
 
     @extend_schema_serializer(component_name="RemovalRequestOutput")
     class OutputSerializer(serializers.Serializer):
