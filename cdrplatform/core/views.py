@@ -1,4 +1,5 @@
 import collections
+import decimal
 import functools
 import math
 from typing import Iterable
@@ -10,7 +11,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .data import FEES
-from .models import CurrencyChoices, RemovalPartner, WeightChoices
+from .models import (
+    CurrencyChoices,
+    CurrencyConversionRate,
+    RemovalPartner,
+    WeightChoices,
+)
 
 
 def removal_partner_list() -> Iterable[RemovalPartner]:
@@ -102,6 +108,21 @@ class CDRPricingView(BaseAPIView):
                 partner = RemovalPartner.objects.get(
                     removal_method__slug=element["method_type"]
                 )
+                # We specify the default ordering on the Model itself (`-date_time`)
+                # so no need to explicitly order again here.
+                currency_converstion_rate = CurrencyConversionRate.objects.filter(
+                    # We convert from the partner currency into the currency requested
+                    # e.g. I want prices in CHF so convert partner cost in USD to CHF
+                    from_currency=partner.currency,
+                    to_currency=input.validated_data.get("currency"),
+                ).first()  # Limit to 1 record to get the latest conversion rate
+
+                if currency_converstion_rate is None:
+                    raise serializers.ValidationError(
+                        f'Unable to convert partner currency "{partner.currency}"'
+                        + f' to "{input.validated_data.get("currency")}"'
+                    )
+
                 if input.validated_data["weight_unit"] == "t":
                     amount_g = element["amount"] * 1000 * 1000
                 elif input.validated_data["weight_unit"] == "kg":
@@ -109,7 +130,13 @@ class CDRPricingView(BaseAPIView):
                 else:
                     amount_g = element["amount"]
 
-                element["cost"] = int(partner.cost_per_tonne * amount_g / (1000 * 1000))
+                partner_cost = decimal.Decimal(
+                    partner.cost_per_tonne * amount_g / (1000 * 1000)
+                )
+
+                element["cost"] = math.ceil(
+                    partner_cost * currency_converstion_rate.rate
+                )
                 return element
 
             items = list(map(calculate_cost, input.validated_data.get("items")))

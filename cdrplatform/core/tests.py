@@ -1,13 +1,29 @@
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from .models import CurrencyChoices, RemovalMethod, RemovalPartner
+from .models import (
+    CurrencyChoices,
+    CurrencyConversionRate,
+    RemovalMethod,
+    RemovalPartner,
+)
 
 
 class CDRPricingViewTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls) -> None:
+        CurrencyConversionRate.objects.bulk_create(
+            (
+                CurrencyConversionRate(
+                    from_currency=CurrencyChoices.USD,
+                    to_currency=CurrencyChoices.CHF,
+                    rate=1.0,
+                    date_time=timezone.now(),
+                ),
+            )
+        )
         removal_method_forestation = RemovalMethod.objects.create(
             name="forestation", slug="forestation", description=""
         )

@@ -209,6 +209,9 @@ class CurrencyConversionRate(models.Model):
     rate = models.DecimalField(max_digits=6, decimal_places=4)
     date_time = models.DateTimeField()
 
+    class Meta:
+        ordering = ("-date_time",)
+
     def __str__(self) -> str:
         return (
             f"{self.from_currency} to {self.to_currency}"
