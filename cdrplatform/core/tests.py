@@ -19,7 +19,7 @@ class CDRPricingViewTestCase(APITestCase):
                 CurrencyConversionRate(
                     from_currency=CurrencyChoices.USD,
                     to_currency=CurrencyChoices.CHF,
-                    rate=1.0,
+                    rate=2.0,
                     date_time=timezone.now(),
                 ),
             )
@@ -67,11 +67,11 @@ class CDRPricingViewTestCase(APITestCase):
             {
                 "cost": {
                     "items": [
-                        {"method_type": "forestation", "amount": 10, "cost": 5520}
+                        {"method_type": "forestation", "amount": 10, "cost": 11040}
                     ],
-                    "removal": 5520,
-                    "variable_fees": 480,
-                    "total": 6000,
+                    "removal": 11040,
+                    "variable_fees": 960,
+                    "total": 12000,
                 },
                 "currency": "chf",
                 "weight_unit": "t",
@@ -124,12 +124,12 @@ class CDRPricingViewTestCase(APITestCase):
             {
                 "cost": {
                     "items": [
-                        {"method_type": "forestation", "amount": 10, "cost": 5520},
-                        {"method_type": "bio-oil", "amount": 10, "cost": 600000},
+                        {"method_type": "forestation", "amount": 10, "cost": 11040},
+                        {"method_type": "bio-oil", "amount": 10, "cost": 1200000},
                     ],
-                    "removal": 605520,
-                    "variable_fees": 52654,
-                    "total": 658174,
+                    "removal": 1211040,
+                    "variable_fees": 105308,
+                    "total": 1316348,
                 },
                 "currency": "chf",
                 "weight_unit": "t",
