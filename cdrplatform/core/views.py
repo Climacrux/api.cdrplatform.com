@@ -115,7 +115,9 @@ class CDRPricingView(BaseAPIView):
             items = list(map(calculate_cost, input.validated_data.get("items")))
             removal_cost = functools.reduce(lambda x, y: x + y["cost"], items, 0)
             variable_fee = math.ceil(
-                FEES["climacrux"]["variable_pct"] * removal_cost / 100
+                removal_cost
+                * FEES["climacrux"]["variable_pct"]
+                / (100 - FEES["climacrux"]["variable_pct"])
             )
 
             output = self.OutputSerializer(
