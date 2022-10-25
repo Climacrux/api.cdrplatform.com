@@ -201,3 +201,10 @@ class RemovalRequestItem(models.Model):
     # amount of CDR in unit defined in related :class:`RemovalRequest`
     # e.g. 5t; 100g; 500kg; etc.
     cdr_amount = models.PositiveIntegerField()
+
+
+class CurrencyConversionRate(models.Model):
+    from_currency = models.CharField(max_length=3, choices=CurrencyChoices.choices)
+    to_currency = models.CharField(max_length=3, choices=CurrencyChoices.choices)
+    rate = models.DecimalField(max_digits=6, decimal_places=4)
+    date_time = models.DateTimeField()
