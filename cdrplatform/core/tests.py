@@ -62,7 +62,7 @@ class CDRPricingViewTestCase(APITestCase):
             "currency": "chf",
             "items": [{"method_type": "forestation", "cdr_amount": 10}],
         }
-        response = self.client.post(url, data, format="json")
+        response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(
             response.data,
@@ -82,7 +82,7 @@ class CDRPricingViewTestCase(APITestCase):
 
     def test_invalid_price_request(self):
         """
-        Check if we get the correct error status for invalid requst data.
+        Check if we get the correct error status for invalid request data.
         """
         url = reverse("v1:cdr_price")
         data = {
@@ -90,7 +90,7 @@ class CDRPricingViewTestCase(APITestCase):
             "currency": "chf",
             "items": [{"method_type": "foo", "cdr_amount": 10}],
         }
-        response = self.client.post(url, data, format="json")
+        response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
             response.data,
@@ -119,7 +119,7 @@ class CDRPricingViewTestCase(APITestCase):
                 {"method_type": "bio-oil", "cdr_amount": 10},
             ],
         }
-        response = self.client.post(url, data, format="json")
+        response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(
             response.data,
@@ -188,7 +188,7 @@ class CDRRemovalViewTestCase(APITestCase):
             "currency": "chf",
             "items": [{"method_type": "forestation", "cdr_amount": 10}],
         }
-        response = self.client.post(url, data, format="json")
+        response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         uuid.UUID(response.data["transaction_uuid"])
 
@@ -202,7 +202,7 @@ class CDRRemovalViewTestCase(APITestCase):
             "currency": "chf",
             "items": [{"method_type": "foo", "cdr_amount": 10}],
         }
-        response = self.client.post(url, data, format="json")
+        response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
             response.data,
@@ -231,6 +231,6 @@ class CDRRemovalViewTestCase(APITestCase):
                 {"method_type": "bio-oil", "cdr_amount": 10},
             ],
         }
-        response = self.client.post(url, data, format="json")
+        response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         uuid.UUID(response.data["transaction_uuid"])
