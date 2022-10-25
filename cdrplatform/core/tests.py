@@ -49,3 +49,29 @@ class CDRPricingViewTestCase(APITestCase):
                 "weight_unit": "t",
             },
         )
+
+    def test_invalid_price_request(self):
+        """
+        Check if we get the correct error status for invalid requst data.
+        """
+        url = reverse("v1:cdr_price")
+        data = {
+            "weight_unit": "t",
+            "currency": "chf",
+            "items": [{"method_type": "foo", "amount": 10}],
+        }
+        response = self.client.post(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.data,
+            {
+                "type": "validation_error",
+                "errors": [
+                    {
+                        "code": "invalid_choice",
+                        "detail": '"foo" is not a valid choice.',
+                        "attr": "items.0.method_type",
+                    }
+                ],
+            },
+        )
