@@ -5,15 +5,13 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from .models import (
-    CurrencyChoices,
-    CurrencyConversionRate,
-    RemovalMethod,
-    RemovalPartner,
-)
+from .models import CurrencyChoices, CurrencyConversionRate
 
 
 class CDRPricingViewTestCase(APITestCase):
+
+    fixtures = ("removal_methods_partners",)
+
     @classmethod
     def setUpTestData(cls) -> None:
         CurrencyConversionRate.objects.bulk_create(
@@ -25,30 +23,6 @@ class CDRPricingViewTestCase(APITestCase):
                     date_time=timezone.now(),
                 ),
             )
-        )
-        removal_method_forestation = RemovalMethod.objects.create(
-            name="forestation", slug="forestation", description=""
-        )
-        removal_method_biooil = RemovalMethod.objects.create(
-            name="bio-oil", slug="bio-oil", description=""
-        )
-        RemovalPartner.objects.create(
-            removal_method=removal_method_forestation,
-            name="eden",
-            slug="eden",
-            description="",
-            website="example.com",
-            cost_per_tonne=552,
-            currency=CurrencyChoices.USD,
-        )
-        RemovalPartner.objects.create(
-            removal_method=removal_method_biooil,
-            name="charm",
-            slug="charm",
-            description="",
-            website="example.com",
-            cost_per_tonne=60000,
-            currency=CurrencyChoices.USD,
         )
         return super().setUpTestData()
 
@@ -140,6 +114,9 @@ class CDRPricingViewTestCase(APITestCase):
 
 
 class CDRRemovalViewTestCase(APITestCase):
+
+    fixtures = ("removal_methods_partners",)
+
     @classmethod
     def setUpTestData(cls) -> None:
         CurrencyConversionRate.objects.bulk_create(
@@ -151,30 +128,6 @@ class CDRRemovalViewTestCase(APITestCase):
                     date_time=timezone.now(),
                 ),
             )
-        )
-        removal_method_forestation = RemovalMethod.objects.create(
-            name="forestation", slug="forestation", description=""
-        )
-        removal_method_biooil = RemovalMethod.objects.create(
-            name="bio-oil", slug="bio-oil", description=""
-        )
-        RemovalPartner.objects.create(
-            removal_method=removal_method_forestation,
-            name="eden",
-            slug="eden",
-            description="",
-            website="example.com",
-            cost_per_tonne=552,
-            currency=CurrencyChoices.USD,
-        )
-        RemovalPartner.objects.create(
-            removal_method=removal_method_biooil,
-            name="charm",
-            slug="charm",
-            description="",
-            website="example.com",
-            cost_per_tonne=60000,
-            currency=CurrencyChoices.USD,
         )
         return super().setUpTestData()
 
