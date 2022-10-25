@@ -35,6 +35,17 @@ $ # Done when needing a superuser
 $ poetry run ./manage.py createsuperuser
 ```
 
+## Loading data into the database
+
+We have some [fixtures](https://docs.djangoproject.com/en/4.1/howto/initial-data/) to make it easy for Django to load data into the database for production & testing purposes.
+
+> **Warning:** Loading a fixture will replace any changes that have been made in the database but are not present in the fixture. From the docs: "Each time you run `loaddata`, the data will be read from the fixture and reloaded into the database. Note this means that if you change one of the rows created by a fixture and then run `loaddata` again, you’ll wipe out any changes you’ve made."
+
+```shell
+$ # Example: Load the `removal_methods` data
+$ poetry run ./manage.py loaddata removal_methods_partners
+```
+
 ## Deployment
 
 _Todo_
