@@ -11,6 +11,8 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from cdrplatform.core.permissions import HasOrganisationAPIKey
+
 from .data import FEES
 from .models import (
     CurrencyChoices,
@@ -41,7 +43,14 @@ class BaseAPIView(APIView):
     pass
 
 
-class CDRPricingView(BaseAPIView):
+class APIKeyRequiredBaseView(BaseAPIView):
+    """A base view that requires callers to have an Organisation API
+    Key attached."""
+
+    permission_classes = (HasOrganisationAPIKey,)
+
+
+class CDRPricingView(APIKeyRequiredBaseView):
     """Calculate a carbon dioxide removal price for a given portfolio of
     CDR items.
     """
@@ -163,7 +172,7 @@ class CDRPricingView(BaseAPIView):
             return Response(output.data, status=status.HTTP_201_CREATED)
 
 
-class CDRRemovalView(BaseAPIView):
+class CDRRemovalView(APIKeyRequiredBaseView):
     """Order and commit to purchasing carbon dioxide removal for a given portfolio of
     CDR items.
     """

@@ -2,10 +2,18 @@ import uuid
 
 from django.urls import reverse
 from django.utils import timezone
+from faker import Faker
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from .models import CurrencyChoices, CurrencyConversionRate
+from .models import (
+    CurrencyChoices,
+    CurrencyConversionRate,
+    CustomerOrganisation,
+    OrganisationAPIKey,
+)
+
+fake = Faker()
 
 
 class CDRPricingViewTestCase(APITestCase):
@@ -14,6 +22,10 @@ class CDRPricingViewTestCase(APITestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
+        org = CustomerOrganisation.objects.create(
+            organisation_name=fake.company(),
+        )
+
         CurrencyConversionRate.objects.bulk_create(
             (
                 CurrencyConversionRate(
@@ -24,7 +36,17 @@ class CDRPricingViewTestCase(APITestCase):
                 ),
             )
         )
+
+        # Create and save an API Key on the class to use later
+        _, cls.apiKey = OrganisationAPIKey.objects.create_key(
+            organisation=org,
+            name="test-api-key",
+        )
         return super().setUpTestData()
+
+    def setUp(self) -> None:
+        self.client.credentials(HTTP_AUTHORIZATION=f"Api-Key {self.apiKey}")
+        return super().setUp()
 
     def test_retrieve_price(self):
         """
@@ -119,6 +141,10 @@ class CDRRemovalViewTestCase(APITestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
+        org = CustomerOrganisation.objects.create(
+            organisation_name=fake.company(),
+        )
+
         CurrencyConversionRate.objects.bulk_create(
             (
                 CurrencyConversionRate(
@@ -129,7 +155,15 @@ class CDRRemovalViewTestCase(APITestCase):
                 ),
             )
         )
+        _, cls.apiKey = OrganisationAPIKey.objects.create_key(
+            organisation=org,
+            name="test-api-key",
+        )
         return super().setUpTestData()
+
+    def setUp(self) -> None:
+        self.client.credentials(HTTP_AUTHORIZATION=f"Api-Key {self.apiKey}")
+        return super().setUp()
 
     def test_carbon_removal_request(self):
         """
