@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.core.mail import send_mail
@@ -12,7 +14,7 @@ def get_sentinel_user():
     return get_user_model().objects.get_or_create(username="DELETED")[0]
 
 
-class WeightChoices(models.TextChoices):
+class WeightUnitChoices(models.TextChoices):
     GRAM = "g", _("Gram")
     KILOGRAM = "kg", _("Kilogram")
     TONNE = "t", _("Tonne")
@@ -74,8 +76,8 @@ class CDRUser(AbstractBaseUser, PermissionsMixin):
 
 class PartnerPurchase(models.Model):
     cdr_amount = models.PositiveIntegerField()
-    cdr_unit = models.CharField(
-        choices=WeightChoices.choices,
+    weight_unit = models.CharField(
+        choices=WeightUnitChoices.choices,
         max_length=2,
     )
     cdr_cost = models.PositiveIntegerField()
@@ -160,8 +162,8 @@ class RemovalMethod(models.Model):
 
 
 class RemovalRequest(models.Model):
-    cdr_unit = models.CharField(
-        choices=WeightChoices.choices,
+    weight_unit = models.CharField(
+        choices=WeightUnitChoices.choices,
         max_length=2,
     )
     requested_datetime = models.DateTimeField(
@@ -178,7 +180,11 @@ class RemovalRequest(models.Model):
         null=True,
         on_delete=models.SET_NULL,
     )
-    uuid = models.UUIDField()
+    uuid = models.UUIDField(
+        unique=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
     customer_order_id = models.CharField(
         max_length=128,
         blank=True,

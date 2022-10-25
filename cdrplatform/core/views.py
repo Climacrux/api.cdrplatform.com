@@ -4,6 +4,7 @@ import functools
 import math
 from typing import Iterable
 
+from django.utils import timezone
 from django.utils.functional import lazy
 from drf_spectacular.utils import extend_schema, extend_schema_serializer
 from rest_framework import serializers, status
@@ -15,7 +16,9 @@ from .models import (
     CurrencyChoices,
     CurrencyConversionRate,
     RemovalPartner,
-    WeightChoices,
+    RemovalRequest,
+    RemovalRequestItem,
+    WeightUnitChoices,
 )
 
 
@@ -50,11 +53,11 @@ class CDRPricingView(BaseAPIView):
                 required=True,
                 choices=lazy(removal_method_choices, tuple)(),
             )
-            amount = serializers.IntegerField(required=True, min_value=1)
+            cdr_amount = serializers.IntegerField(required=True, min_value=1)
 
         weight_unit = serializers.ChoiceField(
             required=True,
-            choices=WeightChoices.choices,
+            choices=WeightUnitChoices.choices,
         )
         currency = serializers.ChoiceField(
             required=True,
@@ -85,7 +88,7 @@ class CDRPricingView(BaseAPIView):
         )
         weight_unit = serializers.ChoiceField(
             required=True,
-            choices=WeightChoices.choices,
+            choices=WeightUnitChoices.choices,
         )
 
     @extend_schema(
@@ -101,7 +104,6 @@ class CDRPricingView(BaseAPIView):
         # caught and handled by drf-standardized-errors.
         # This means it will have the same error format as every other error 👍
         if input.is_valid(raise_exception=True):
-            # todo: perform the calculation here
 
             def calculate_cost(element):
                 partner = RemovalPartner.objects.get(
@@ -123,11 +125,11 @@ class CDRPricingView(BaseAPIView):
                     )
 
                 if input.validated_data["weight_unit"] == "t":
-                    amount_g = element["amount"] * 1000 * 1000
+                    amount_g = element["cdr_amount"] * 1000 * 1000
                 elif input.validated_data["weight_unit"] == "kg":
-                    amount_g = element["amount"] * 1000
+                    amount_g = element["cdr_amount"] * 1000
                 else:
-                    amount_g = element["amount"]
+                    amount_g = element["cdr_amount"]
 
                 partner_cost = decimal.Decimal(
                     partner.cost_per_tonne * amount_g / (1000 * 1000)
@@ -161,7 +163,7 @@ class CDRPricingView(BaseAPIView):
             return Response(output.data, status=status.HTTP_201_CREATED)
 
 
-class CDRRemoval(BaseAPIView):
+class CDRRemovalView(BaseAPIView):
     """Order and commit to purchasing carbon dioxide removal for a given portfolio of
     CDR items.
     """
@@ -173,16 +175,25 @@ class CDRRemoval(BaseAPIView):
                 required=True,
                 choices=lazy(removal_method_choices, tuple)(),
             )
-            amount = serializers.IntegerField(required=True, min_value=1)
+            cdr_amount = serializers.IntegerField(required=True, min_value=1)
 
         weight_unit = serializers.ChoiceField(
             required=True,
-            choices=WeightChoices.choices,
+            choices=WeightUnitChoices.choices,
         )
         currency = serializers.ChoiceField(
             choices=CurrencyChoices.choices,
         )
-        items = InputRemovalMethodSerializer(many=True)
+        items = InputRemovalMethodSerializer(many=True, min_length=1)
+
+        def validate_items(self, value):
+            counter = collections.Counter(map(lambda x: x["method_type"], value))
+            for key in counter:
+                if counter[key] > 1:
+                    raise serializers.ValidationError(
+                        f'"{key}" can not appear more than once in items.'
+                    )
+            return value
 
     @extend_schema_serializer(component_name="RemovalRequestOutput")
     class OutputSerializer(serializers.Serializer):
@@ -196,4 +207,26 @@ class CDRRemoval(BaseAPIView):
         methods=("POST",),
     )
     def post(self, request):
-        return Response({"foo": request.version})
+        input = self.InputSerializer(data=request.data)
+        # We raise an exception if the data is invalid because it will be automatically
+        # caught and handled by drf-standardized-errors.
+        # This means it will have the same error format as every other error 👍
+        if input.is_valid(raise_exception=True):
+            removal_request = RemovalRequest.objects.create(
+                weight_unit=input.validated_data.get("weight_unit"),
+                requested_datetime=timezone.now(),
+                currency=input.validated_data.get("currency"),
+                customer_organisation=None,
+            )
+            for item in input.validated_data.get("items"):
+                removal_partner = RemovalPartner.objects.get(
+                    removal_method__slug=item["method_type"]
+                )
+                RemovalRequestItem.objects.create(
+                    removal_partner=removal_partner,
+                    removal_request=removal_request,
+                    cdr_cost=0,
+                    cdr_amount=item.get("cdr_amount"),
+                )
+            output = self.OutputSerializer({"transaction_uuid": removal_request.uuid})
+            return Response(output.data, status=status.HTTP_201_CREATED)

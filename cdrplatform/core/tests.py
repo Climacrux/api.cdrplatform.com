@@ -58,7 +58,7 @@ class CDRPricingViewTestCase(APITestCase):
         data = {
             "weight_unit": "t",
             "currency": "chf",
-            "items": [{"method_type": "forestation", "amount": 10}],
+            "items": [{"method_type": "forestation", "cdr_amount": 10}],
         }
         response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -67,7 +67,7 @@ class CDRPricingViewTestCase(APITestCase):
             {
                 "cost": {
                     "items": [
-                        {"method_type": "forestation", "amount": 10, "cost": 11040}
+                        {"method_type": "forestation", "cdr_amount": 10, "cost": 11040}
                     ],
                     "removal": 11040,
                     "variable_fees": 960,
@@ -86,7 +86,7 @@ class CDRPricingViewTestCase(APITestCase):
         data = {
             "weight_unit": "t",
             "currency": "chf",
-            "items": [{"method_type": "foo", "amount": 10}],
+            "items": [{"method_type": "foo", "cdr_amount": 10}],
         }
         response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -113,8 +113,8 @@ class CDRPricingViewTestCase(APITestCase):
             "weight_unit": "t",
             "currency": "chf",
             "items": [
-                {"method_type": "forestation", "amount": 10},
-                {"method_type": "bio-oil", "amount": 10},
+                {"method_type": "forestation", "cdr_amount": 10},
+                {"method_type": "bio-oil", "cdr_amount": 10},
             ],
         }
         response = self.client.post(url, data, format="json")
@@ -124,8 +124,8 @@ class CDRPricingViewTestCase(APITestCase):
             {
                 "cost": {
                     "items": [
-                        {"method_type": "forestation", "amount": 10, "cost": 11040},
-                        {"method_type": "bio-oil", "amount": 10, "cost": 1200000},
+                        {"method_type": "forestation", "cdr_amount": 10, "cost": 11040},
+                        {"method_type": "bio-oil", "cdr_amount": 10, "cost": 1200000},
                     ],
                     "removal": 1211040,
                     "variable_fees": 105308,
