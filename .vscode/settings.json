@@ -4,6 +4,7 @@
     "CDRPLATFORM",
     "Climacrux",
     "Ewan",
+    "Organisation",
     "psycopg",
     "runserver",
     "WHITENOISE"
