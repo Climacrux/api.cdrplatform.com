@@ -94,6 +94,12 @@ class PartnerPurchase(models.Model):
     completed_date = models.DateField(null=True)
     invoice_file = models.FileField(null=True)
 
+    def __str__(self) -> str:
+        return (
+            f"{self.cdr_amount}{self.get_weight_unit_display()}"
+            + f" - {self.currency}{self.cdr_cost}"
+        )
+
 
 class CustomerInvoice(models.Model):
     invoice_id = models.CharField(max_length=10)
@@ -109,6 +115,14 @@ class CustomerInvoice(models.Model):
     receiver_email = models.EmailField()
     invoice_file = models.FileField(null=True)
 
+    @property
+    def is_paid(self):
+        """Helper function to tell if the invoice is paid or not."""
+        return self.paid_date is not None
+
+    def __str__(self) -> str:
+        return f"{self.invoice_id} - {self.issued_date.strftime('%Y/%m/%d')}"
+
 
 class PartnerConfirmation(models.Model):
     partner_purchase = models.ForeignKey(
@@ -119,6 +133,9 @@ class PartnerConfirmation(models.Model):
     confirmation_url = models.URLField(null=True)
     confirmation_file = models.FileField(null=True)
     confirmation_image = models.ImageField(null=True)
+
+    def __str__(self) -> str:
+        return f"{self.confirmation_id} - " + f"{self.confirmation_url}"
 
 
 class RemovalPartner(models.Model):
@@ -147,6 +164,13 @@ class Certificate(models.Model):
     certificate_id = models.CharField(max_length=11)
     issued_date = models.DateField()
     display_name = models.CharField(max_length=128)
+
+    def __str__(self) -> str:
+        return (
+            f"{self.certificate_id} - "
+            + f"{self.display_name} - "
+            + f"{self.issued_date.strftime('%Y/%m/%d')}"
+        )
 
 
 class CustomerOrganisation(models.Model):
