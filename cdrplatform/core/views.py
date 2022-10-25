@@ -34,14 +34,6 @@ def removal_method_choices():
     return _partners
 
 
-class InputRemovalMethodSerializer(serializers.Serializer):
-    method_type = serializers.ChoiceField(
-        required=True,
-        choices=lazy(removal_method_choices, tuple)(),
-    )
-    amount = serializers.IntegerField(required=True, min_value=1)
-
-
 class BaseAPIView(APIView):
     pass
 
@@ -53,6 +45,13 @@ class CDRPricingView(BaseAPIView):
 
     @extend_schema_serializer(component_name="PricingRequestInput")
     class InputSerializer(serializers.Serializer):
+        class InputRemovalMethodSerializer(serializers.Serializer):
+            method_type = serializers.ChoiceField(
+                required=True,
+                choices=lazy(removal_method_choices, tuple)(),
+            )
+            amount = serializers.IntegerField(required=True, min_value=1)
+
         weight_unit = serializers.ChoiceField(
             required=True,
             choices=WeightChoices.choices,
@@ -169,6 +168,13 @@ class CDRRemoval(BaseAPIView):
 
     @extend_schema_serializer(component_name="RemovalRequestInput")
     class InputSerializer(serializers.Serializer):
+        class InputRemovalMethodSerializer(serializers.Serializer):
+            method_type = serializers.ChoiceField(
+                required=True,
+                choices=lazy(removal_method_choices, tuple)(),
+            )
+            amount = serializers.IntegerField(required=True, min_value=1)
+
         weight_unit = serializers.ChoiceField(
             required=True,
             choices=WeightChoices.choices,
