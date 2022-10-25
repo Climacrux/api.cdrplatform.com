@@ -34,5 +34,18 @@ class CDRPricingViewTestCase(APITestCase):
         }
         response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        # check if it is the correct price
-        # check 401 status with bad data
+        self.assertEqual(
+            response.data,
+            {
+                "cost": {
+                    "items": [
+                        {"method_type": "forestation", "amount": 10, "cost": 5520}
+                    ],
+                    "removal": 5520,
+                    "variable_fees": 480,
+                    "total": 6000,
+                },
+                "currency": "chf",
+                "weight_unit": "t",
+            },
+        )
