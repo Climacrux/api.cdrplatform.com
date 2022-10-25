@@ -1,0 +1,98 @@
+---
+#########################
+# Removal Methods
+#########################
+- model: core.RemovalMethod
+  pk: 1
+  fields:
+    name: Forestation
+    slug: forestation
+    description: |
+      A long description about trees
+- model: core.RemovalMethod
+  pk: 2
+  fields:
+    name: Direct Air Capture & Storage
+    slug: dacs
+    description: |
+      A long description about DACS
+- model: core.RemovalMethod
+  pk: 3
+  fields:
+    name: Bio-oil
+    slug: bio-oil
+    description: |
+      A long description about bio-oil
+- model: core.RemovalMethod
+  pk: 4
+  fields:
+    name: Kelp sinking
+    slug: kelp-sinking
+    description: |
+      A long description about sinking kelp
+- model: core.RemovalMethod
+  pk: 5
+  fields:
+    name: Olivine
+    slug: olivine
+    description: |
+      A long description about olivine
+
+#########################
+# Removal Partners
+#########################
+- model: core.RemovalPartner
+  pk: 1
+  fields:
+    removal_method: 1
+    name: Eden Reforestation
+    slug: eden-reforestation
+    description: |
+      A long description about eden
+    website: https://www.edenprojects.org/
+    cost_per_tonne: 552
+    currency: usd
+- model: core.RemovalPartner
+  pk: 2
+  fields:
+    removal_method: 2
+    name: Climeworks
+    slug: climeworks
+    description: |
+      A long description about Climeworks
+    website: https://climeworks.com/
+    cost_per_tonne: 100161
+    currency: chf
+- model: core.RemovalPartner
+  pk: 3
+  fields:
+    removal_method: 3
+    name: Charm Industrial
+    slug: charm-industrial
+    description: |
+      A long description about Charm
+    website: https://charmindustrial.com/
+    cost_per_tonne: 60000
+    currency: usd
+- model: core.RemovalPartner
+  pk: 4
+  fields:
+    removal_method: 4
+    name: Running Tide
+    slug: running-tide
+    description: |
+      A long description about Running Tide
+    website: https://www.runningtide.com/
+    cost_per_tonne: 25000
+    currency: usd
+- model: core.RemovalPartner
+  pk: 5
+  fields:
+    removal_method: 5
+    name: greenSand
+    slug: greensand
+    description: |
+      A long description about GreenSand
+    website: https://greensand.com/
+    cost_per_tonne: 10584
+    currency: eur
