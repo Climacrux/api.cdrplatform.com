@@ -1,6 +1,10 @@
 from django.contrib import admin
 
-from cdrplatform.core.models import RemovalMethod, RemovalPartner
+from cdrplatform.core.models import (
+    CurrencyConversionRate,
+    RemovalMethod,
+    RemovalPartner,
+)
 
 
 @admin.register(RemovalMethod)
@@ -17,3 +21,13 @@ class RemovalPartnerAdmin(admin.ModelAdmin):
         "currency",
     )
     prepopulated_fields = {"slug": ("name",)}
+
+
+@admin.register(CurrencyConversionRate)
+class CurrencyConversionRateAdmin(admin.ModelAdmin):
+    list_display = (
+        "from_currency",
+        "to_currency",
+        "rate",
+        "date_time",
+    )

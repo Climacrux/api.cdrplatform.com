@@ -208,3 +208,9 @@ class CurrencyConversionRate(models.Model):
     to_currency = models.CharField(max_length=3, choices=CurrencyChoices.choices)
     rate = models.DecimalField(max_digits=6, decimal_places=4)
     date_time = models.DateTimeField()
+
+    def __str__(self) -> str:
+        return (
+            f"{self.from_currency} to {self.to_currency}"
+            + f" - {self.date_time.strftime('%Y-%m-%d')}"
+        )
