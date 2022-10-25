@@ -110,14 +110,14 @@ class CDRPricingView(BaseAPIView):
                 )
                 # We specify the default ordering on the Model itself (`-date_time`)
                 # so no need to explicitly order again here.
-                currency_converstion_rate = CurrencyConversionRate.objects.filter(
+                currency_conversion_rate = CurrencyConversionRate.objects.filter(
                     # We convert from the partner currency into the currency requested
                     # e.g. I want prices in CHF so convert partner cost in USD to CHF
                     from_currency=partner.currency,
                     to_currency=input.validated_data.get("currency"),
                 ).first()  # Limit to 1 record to get the latest conversion rate
 
-                if currency_converstion_rate is None:
+                if currency_conversion_rate is None:
                     raise serializers.ValidationError(
                         f'Unable to convert partner currency "{partner.currency}"'
                         + f' to "{input.validated_data.get("currency")}"'
@@ -135,7 +135,7 @@ class CDRPricingView(BaseAPIView):
                 )
 
                 element["cost"] = math.ceil(
-                    partner_cost * currency_converstion_rate.rate
+                    partner_cost * currency_conversion_rate.rate
                 )
                 return element
 
