@@ -15,10 +15,12 @@ Including another URLconf
 """
 from django.conf import settings
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path, reverse_lazy
+from django.views.generic.base import RedirectView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
-app_patterns = [
+app_patterns = (
+    re_path("^$", RedirectView.as_view(url=reverse_lazy("swagger-ui"))),
     path("v1/", include("cdrplatform.core.urls", namespace="v1")),
     # path("v2/", include("cdrplatform.core.urls", namespace="v2")),
     path("schema/", SpectacularAPIView.as_view(api_version="v1"), name="schema"),
@@ -27,20 +29,16 @@ app_patterns = [
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
-]
+)
 
-other_patterns = [
+other_patterns = (
     # path("accounts/", include(("django.contrib.auth.urls", "auth"))),
-]
+)
 if settings.ENABLE_DJANGO_ADMIN:
-    other_patterns.append(
-        path(settings.DJANGO_ADMIN_PATH, admin.site.urls),
-    )
+    other_patterns += (path(settings.DJANGO_ADMIN_PATH, admin.site.urls),)
 
 if settings.DEBUG:
-    other_patterns.append(
-        path("__debug__/", include("debug_toolbar.urls")),
-    )
+    other_patterns += (path("__debug__/", include("debug_toolbar.urls")),)
 
 
 urlpatterns = app_patterns + other_patterns
