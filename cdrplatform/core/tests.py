@@ -11,6 +11,7 @@ from .models import (
     CurrencyConversionRate,
     CustomerOrganisation,
     OrganisationAPIKey,
+    RemovalRequest,
 )
 
 fake = Faker()
@@ -22,13 +23,13 @@ class APIKeyMixin:
 
     @classmethod
     def setUpTestData(cls) -> None:
-        org = CustomerOrganisation.objects.create(
+        cls.org = CustomerOrganisation.objects.create(
             organisation_name=fake.company(),
         )
 
         # Create and save an API Key on the class to use later
         _, cls.apiKey = OrganisationAPIKey.objects.create_key(
-            organisation=org,
+            organisation=cls.org,
             name="test-api-key",
         )
         return super().setUpTestData()
@@ -176,6 +177,9 @@ class CDRRemovalViewTestCase(APIKeyMixin, APITestCase):
         uuid.UUID(
             response.data["transaction_uuid"]
         )  # this will raise an exception if not a valid UUID
+        # We should have created one removal request for our org
+        removal_requests = RemovalRequest.objects.filter(customer_organisation=self.org)
+        self.assertEqual(removal_requests.count(), 1)
 
     def test_invalid_carbon_removal_request(self):
         """
@@ -202,6 +206,9 @@ class CDRRemovalViewTestCase(APIKeyMixin, APITestCase):
                 ],
             },
         )
+        # This should not have created a removal request for our org
+        removal_requests = RemovalRequest.objects.filter(customer_organisation=self.org)
+        self.assertEqual(removal_requests.count(), 0)
 
     def test_multiple_carbon_removal_request(self):
         """
@@ -218,6 +225,17 @@ class CDRRemovalViewTestCase(APIKeyMixin, APITestCase):
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        uuid.UUID(
+        transaction_uuid = uuid.UUID(
             response.data["transaction_uuid"]
         )  # this will raise an exception if not a valid UUID
+
+        removal_requests = RemovalRequest.objects.filter(customer_organisation=self.org)
+        # Check the UUID matches
+        self.assertEqual(removal_requests.first().uuid, transaction_uuid)
+        # We should have created one removal request for our org
+        self.assertEqual(removal_requests.count(), 1)
+
+        # Send another request and check we have the correct number of requests
+        response = self.client.post(url, data)
+        removal_requests = RemovalRequest.objects.filter(customer_organisation=self.org)
+        self.assertEqual(removal_requests.count(), 2)
