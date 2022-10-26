@@ -35,6 +35,12 @@ $ # Done when needing a superuser
 $ poetry run ./manage.py createsuperuser
 ```
 
+### Trying out requests to the API
+
+It's up to you, the developer, as to how you want to
+
+However if you use [VSCode REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client), we provide a series of `.rest` files in the `rest-examples` directory.
+
 ## Loading data into the database
 
 We have some [fixtures](https://docs.djangoproject.com/en/4.1/howto/initial-data/) to make it easy for Django to load data into the database for production & testing purposes.
