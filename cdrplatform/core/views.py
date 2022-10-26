@@ -43,14 +43,23 @@ class BaseAPIView(APIView):
     pass
 
 
-class APIKeyRequiredBaseView(BaseAPIView):
+class UnauthenticatedMixin:
+    """Removes the default authentication. This is useful for us as API endpoints
+    will require authentication by default (configured in `settings.py`) but
+    can be explicitly disabled when we want to rely on using an APIKey to
+    associate a request with an Organisation."""
+
+    authentication_classes = ()
+
+
+class APIKeyRequiredMixin:
     """A base view that requires callers to have an Organisation API
     Key attached."""
 
     permission_classes = (HasOrganisationAPIKey,)
 
 
-class CDRPricingView(APIKeyRequiredBaseView):
+class CDRPricingView(BaseAPIView, UnauthenticatedMixin, APIKeyRequiredMixin):
     """Calculate a carbon dioxide removal price for a given portfolio of
     CDR items.
     """
@@ -172,7 +181,7 @@ class CDRPricingView(APIKeyRequiredBaseView):
             return Response(output.data, status=status.HTTP_201_CREATED)
 
 
-class CDRRemovalView(APIKeyRequiredBaseView):
+class CDRRemovalView(BaseAPIView, UnauthenticatedMixin, APIKeyRequiredMixin):
     """Order and commit to purchasing carbon dioxide removal for a given portfolio of
     CDR items.
     """
