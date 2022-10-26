@@ -9,3 +9,15 @@ Authorization: Api-Key {{api-key}}
         {"method_type": "forestation", "cdr_amount": 10}
     ]
 }
+###
+POST {{host}}/v1/cdr/ HTTP/1.1
+content-type: application/json
+Authorization: Api-Key {{api-key}}
+
+{
+    "weight_unit": "t",
+    "currency": "usd",
+    "items": [
+        {"method_type": "forestation", "cdr_amount": 10}
+    ]
+}

@@ -17,6 +17,7 @@ from .data import FEES
 from .models import (
     CurrencyChoices,
     CurrencyConversionRate,
+    OrganisationAPIKey,
     RemovalPartner,
     RemovalRequest,
     RemovalRequestItem,
@@ -230,11 +231,13 @@ class CDRRemovalView(BaseAPIView, UnauthenticatedMixin, APIKeyRequiredMixin):
         # caught and handled by drf-standardized-errors.
         # This means it will have the same error format as every other error 👍
         if input.is_valid(raise_exception=True):
+            key = request.META["HTTP_AUTHORIZATION"].split()[1]
+            api_key = OrganisationAPIKey.objects.get_from_key(key)
             removal_request = RemovalRequest.objects.create(
                 weight_unit=input.validated_data.get("weight_unit"),
                 requested_datetime=timezone.now(),
                 currency=input.validated_data.get("currency"),
-                customer_organisation=None,
+                customer_organisation_id=api_key.organisation_id,
             )
             for item in input.validated_data.get("items"):
                 removal_partner = RemovalPartner.objects.get(
