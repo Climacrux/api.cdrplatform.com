@@ -11,5 +11,15 @@
     "runserver",
     "WHITENOISE"
   ],
-  "python.formatting.provider": "black"
+  "python.formatting.provider": "black",
+  "esbonio.sphinx.confDir": "",
+  "rest-client.environmentVariables": {
+    "$shared": {},
+    "local": {
+      "host": "http://localhost:8000",
+      // Local key that matches the key from the fixtures/development/api-keys.yaml
+      // used for development only.
+      "api-key": "Q3zEILSn.GccmbFZWCVqUsdzPr1LSR0JKMiBpgnfT"
+    }
+  }
 }
