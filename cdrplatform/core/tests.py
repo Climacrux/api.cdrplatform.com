@@ -16,25 +16,14 @@ from .models import (
 fake = Faker()
 
 
-class CDRPricingViewTestCase(APITestCase):
-
-    fixtures = ("removal_methods_partners",)
+class APIKeyMixin:
+    """Our API needs an API Key so use this mixin
+    to have the functionality setup and configured."""
 
     @classmethod
     def setUpTestData(cls) -> None:
         org = CustomerOrganisation.objects.create(
             organisation_name=fake.company(),
-        )
-
-        CurrencyConversionRate.objects.bulk_create(
-            (
-                CurrencyConversionRate(
-                    from_currency=CurrencyChoices.USD,
-                    to_currency=CurrencyChoices.CHF,
-                    rate=2.0,
-                    date_time=timezone.now(),
-                ),
-            )
         )
 
         # Create and save an API Key on the class to use later
@@ -47,6 +36,25 @@ class CDRPricingViewTestCase(APITestCase):
     def setUp(self) -> None:
         self.client.credentials(HTTP_AUTHORIZATION=f"Api-Key {self.apiKey}")
         return super().setUp()
+
+
+class CDRPricingViewTestCase(APIKeyMixin, APITestCase):
+
+    fixtures = ("removal_methods_partners",)
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        CurrencyConversionRate.objects.bulk_create(
+            (
+                CurrencyConversionRate(
+                    from_currency=CurrencyChoices.USD,
+                    to_currency=CurrencyChoices.CHF,
+                    rate=2.0,
+                    date_time=timezone.now(),
+                ),
+            )
+        )
+        return super().setUpTestData()
 
     def test_retrieve_price(self):
         """
@@ -135,16 +143,12 @@ class CDRPricingViewTestCase(APITestCase):
         )
 
 
-class CDRRemovalViewTestCase(APITestCase):
+class CDRRemovalViewTestCase(APIKeyMixin, APITestCase):
 
     fixtures = ("removal_methods_partners",)
 
     @classmethod
     def setUpTestData(cls) -> None:
-        org = CustomerOrganisation.objects.create(
-            organisation_name=fake.company(),
-        )
-
         CurrencyConversionRate.objects.bulk_create(
             (
                 CurrencyConversionRate(
@@ -155,15 +159,7 @@ class CDRRemovalViewTestCase(APITestCase):
                 ),
             )
         )
-        _, cls.apiKey = OrganisationAPIKey.objects.create_key(
-            organisation=org,
-            name="test-api-key",
-        )
         return super().setUpTestData()
-
-    def setUp(self) -> None:
-        self.client.credentials(HTTP_AUTHORIZATION=f"Api-Key {self.apiKey}")
-        return super().setUp()
 
     def test_carbon_removal_request(self):
         """
