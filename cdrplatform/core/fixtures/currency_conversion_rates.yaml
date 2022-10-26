@@ -1,0 +1,32 @@
+---
+#########################
+# Default currency conversion rates
+#########################
+- model: core.CurrencyConversionRate
+  pk: 1
+  fields:
+    from_currency: usd
+    to_currency: usd
+    rate: 1.0
+    date_time: 1970-01-01 12:00:00.000000+00:00
+- model: core.CurrencyConversionRate
+  pk: 2
+  fields:
+    from_currency: chf
+    to_currency: chf
+    rate: 1.0
+    date_time: 1970-01-01 12:00:00.000000+00:00
+- model: core.CurrencyConversionRate
+  pk: 3
+  fields:
+    from_currency: eur
+    to_currency: eur
+    rate: 1.0
+    date_time: 1970-01-01 12:00:00.000000+00:00
+- model: core.CurrencyConversionRate
+  pk: 4
+  fields:
+    from_currency: gbp
+    to_currency: gbp
+    rate: 1.0
+    date_time: 1970-01-01 12:00:00.000000+00:00
