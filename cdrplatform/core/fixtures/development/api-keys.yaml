@@ -1,0 +1,27 @@
+---
+#########################
+# Organisations
+#########################
+- model: core.CustomerOrganisation
+  pk: 1
+  fields:
+    organisation_name: A local test organisation
+- model: core.CustomerOrganisation
+  pk: 2
+  fields:
+    organisation_name: Climacrux LLC
+
+#########################
+# Organisation API Keys
+#########################
+- model: core.OrganisationAPIKey
+  pk: Q3zEILSn.argon2$argon2id$v=19$m=131072,t=4,p=12$SG1yUW9KMnczczVTbUdIeXNZUFFjRA$r5ixHvK1kmASYsxdSwjEnCbDz+XvtA9n2iP1XxcGPgk
+  fields:
+    prefix: Q3zEILSn
+    # key: Q3zEILSn.GccmbFZWCVqUsdzPr1LSR0JKMiBpgnfT
+    hashed_key: argon2$argon2id$v=19$m=131072,t=4,p=12$SG1yUW9KMnczczVTbUdIeXNZUFFjRA$r5ixHvK1kmASYsxdSwjEnCbDz+XvtA9n2iP1XxcGPgk
+    created: 2022-10-26 07:16:38.849160+00:00
+    name: local-test-key
+    revoked: false
+    expiry_date: null
+    organisation: 1
