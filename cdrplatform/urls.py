@@ -17,10 +17,14 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path, reverse_lazy
 from django.views.generic.base import RedirectView
-from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
 
 app_patterns = (
-    path("", RedirectView.as_view(url=reverse_lazy("swagger-ui"))),
+    path("", RedirectView.as_view(url=reverse_lazy("redoc"))),
     path("v1/", include("cdrplatform.core.urls", namespace="v1")),
     # path("v2/", include("cdrplatform.core.urls", namespace="v2")),
     path("schema/", SpectacularAPIView.as_view(api_version="v1"), name="schema"),
@@ -28,6 +32,9 @@ app_patterns = (
         "schema/swagger-ui/",
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
+    ),
+    path(
+        "schema/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"
     ),
 )
 
