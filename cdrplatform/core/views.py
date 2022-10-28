@@ -21,7 +21,7 @@ from .models import (
     RemovalRequestItem,
     WeightUnitChoices,
 )
-from .selectors import api_key_get_from_key
+from .selectors import api_key_get_from_key, removal_partner_get_from_method_slug
 
 
 def removal_partner_list() -> Iterable[RemovalPartner]:
@@ -245,7 +245,7 @@ removal certificate
         # This means it will have the same error format as every other error 👍
         if input.is_valid(raise_exception=True):
             key = request.META["HTTP_AUTHORIZATION"].split()[1]
-            api_key = api_key_get_from_key(key)
+            api_key = api_key_get_from_key(key=key)
             removal_request = RemovalRequest.objects.create(
                 weight_unit=input.validated_data.get("weight_unit"),
                 requested_datetime=timezone.now(),
@@ -253,8 +253,8 @@ removal certificate
                 customer_organisation_id=api_key.organisation_id,
             )
             for item in input.validated_data.get("items"):
-                removal_partner = RemovalPartner.objects.get(
-                    removal_method__slug=item["method_type"]
+                removal_partner = removal_partner_get_from_method_slug(
+                    method_slug=item["method_type"]
                 )
                 RemovalRequestItem.objects.create(
                     removal_partner=removal_partner,
