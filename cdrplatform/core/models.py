@@ -213,7 +213,21 @@ class RemovalRequest(models.Model):
         default=uuid.uuid4,
         editable=False,
     )
-    customer_order_id = models.CharField(
+
+    # ##################
+    # Optional metadata fields that can be provided
+    # by the customer when making the request
+    # ##################
+
+    # client_reference_id - an identifier provided by the customer that can be used to
+    # lookup requests in the future
+    # example: e-commerce order ID where CO2 was purchased
+    meta_client_reference_id = models.CharField(
+        max_length=128,
+        blank=True,
+    )
+    # a custom display name for the certificate that will be generated
+    meta_certificate_display_name = models.CharField(
         max_length=128,
         blank=True,
     )
