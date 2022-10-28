@@ -46,7 +46,8 @@ class RemovalRequestAdmin(admin.ModelAdmin):
         "currency",
         "customer_organisation",
         "uuid",
-        "customer_order_id",
+        "meta_client_reference_id",
+        "meta_certificate_display_name",
     )
 
 
