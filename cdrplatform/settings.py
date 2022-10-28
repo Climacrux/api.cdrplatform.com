@@ -240,6 +240,37 @@ Fetch prices and order carbon dioxide removal from a portfolio of suppliers.""",
     "POSTPROCESSING_HOOKS": [
         "drf_standardized_errors.openapi_hooks.postprocess_schema_enums"
     ],
+    "AUTHENTICATION_WHITELIST": ("cdrplatform.core.permissions.HasOrganisationAPIKey",),
+    "APPEND_COMPONENTS": {
+        "securitySchemes": {
+            "Organisation API Key": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "Authorization",
+                "description": """API keys are allocated to an organisation.
+Each organisation can have multiple API keys if they so wish.
+
+To authenticate requests, include the API key in the HTTP `Authorization` header
+under the type `Api-Key`.
+
+Example:
+
+`Authorization: Api-Key {{ your_api_key }}`
+
+---
+
+_Read more on API keys, their security and how to get one in [our
+docs](https://docs.cdrplatform.com/)._
+
+""",
+            },
+        },
+    },
+    "SECURITY": [
+        {
+            "Organisation API Key": [],
+        }
+    ],
 }
 
 
