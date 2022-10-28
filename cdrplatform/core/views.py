@@ -60,6 +60,9 @@ class APIKeyRequiredMixin:
     permission_classes = (HasOrganisationAPIKey,)
 
 
+@extend_schema(
+    tags=("CO₂ Removal",),
+)
 class CDRPricingView(BaseAPIView, UnauthenticatedMixin, APIKeyRequiredMixin):
     """Calculate a carbon dioxide removal price for a given portfolio of
     CDR items.
@@ -67,6 +70,7 @@ class CDRPricingView(BaseAPIView, UnauthenticatedMixin, APIKeyRequiredMixin):
 
     @extend_schema_serializer(component_name="PricingRequestInput")
     class InputSerializer(serializers.Serializer):
+        @extend_schema_serializer(component_name="PricingRequestRemovalMethod")
         class InputRemovalMethodSerializer(serializers.Serializer):
             method_type = serializers.ChoiceField(
                 required=True,
@@ -111,11 +115,14 @@ class CDRPricingView(BaseAPIView, UnauthenticatedMixin, APIKeyRequiredMixin):
         )
 
     @extend_schema(
+        operation_id="Calculate price of CDR",
         request=InputSerializer,
         responses={
             status.HTTP_201_CREATED: OutputSerializer,
         },
-        methods=("POST",),
+        tags=("CO₂ Removal",),
+        description="""Calculate the removal costs and
+fees for a future CO₂ removal purchase.""",
     )
     def post(self, request):
         input = self.InputSerializer(data=request.data)
@@ -182,6 +189,9 @@ class CDRPricingView(BaseAPIView, UnauthenticatedMixin, APIKeyRequiredMixin):
             return Response(output.data, status=status.HTTP_201_CREATED)
 
 
+@extend_schema(
+    tags=("CO₂ Removal",),
+)
 class CDRRemovalView(BaseAPIView, UnauthenticatedMixin, APIKeyRequiredMixin):
     """Order and commit to purchasing carbon dioxide removal for a given portfolio of
     CDR items.
@@ -189,6 +199,7 @@ class CDRRemovalView(BaseAPIView, UnauthenticatedMixin, APIKeyRequiredMixin):
 
     @extend_schema_serializer(component_name="RemovalRequestInput")
     class InputSerializer(serializers.Serializer):
+        @extend_schema_serializer(component_name="CDRRemovalRequestRemovalMethod")
         class InputRemovalMethodSerializer(serializers.Serializer):
             method_type = serializers.ChoiceField(
                 required=True,
@@ -223,7 +234,16 @@ class CDRRemovalView(BaseAPIView, UnauthenticatedMixin, APIKeyRequiredMixin):
         responses={
             status.HTTP_201_CREATED: OutputSerializer,
         },
-        methods=("POST",),
+        operation_id="Purchase CDR",
+        description="""Submit .
+
+By using this endpoint your organisation is committing to buy
+
+Returns a transaction ID that is unique to this removal request. This can
+be stored in your records and used to retrieve the status of the request,
+removal certificate
+
+**Note:** This will not return any """,
     )
     def post(self, request):
         input = self.InputSerializer(data=request.data)
