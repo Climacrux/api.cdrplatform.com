@@ -1,7 +1,5 @@
 import collections
-import decimal
 import functools
-import math
 from typing import Iterable
 
 from django.utils import timezone
@@ -12,16 +10,19 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .auth import APIKeyRequiredMixin, UnauthenticatedMixin
-from .data import FEES
 from .models import (
     CurrencyChoices,
-    CurrencyConversionRate,
     RemovalPartner,
     RemovalRequest,
     RemovalRequestItem,
     WeightUnitChoices,
 )
-from .selectors import api_key_get_from_key, removal_partner_get_from_method_slug
+from .selectors import (
+    api_key_get_from_key,
+    removal_method_calculate_cost,
+    removal_partner_get_from_method_slug,
+    variable_fees_calculate,
+)
 
 
 def removal_partner_list() -> Iterable[RemovalPartner]:
@@ -115,47 +116,17 @@ fees for a future CO₂ removal purchase.""",
         if input.is_valid(raise_exception=True):
 
             def calculate_cost(element):
-                partner = RemovalPartner.objects.get(
-                    removal_method__slug=element["method_type"]
-                )
-                # We specify the default ordering on the Model itself (`-date_time`)
-                # so no need to explicitly order again here.
-                currency_conversion_rate = CurrencyConversionRate.objects.filter(
-                    # We convert from the partner currency into the currency requested
-                    # e.g. I want prices in CHF so convert partner cost in USD to CHF
-                    from_currency=partner.currency,
-                    to_currency=input.validated_data.get("currency"),
-                ).first()  # Limit to 1 record to get the latest conversion rate
-
-                if currency_conversion_rate is None:
-                    raise serializers.ValidationError(
-                        f'Unable to convert partner currency "{partner.currency}"'
-                        + f' to "{input.validated_data.get("currency")}"'
-                    )
-
-                if input.validated_data["weight_unit"] == "t":
-                    amount_g = element["cdr_amount"] * 1000 * 1000
-                elif input.validated_data["weight_unit"] == "kg":
-                    amount_g = element["cdr_amount"] * 1000
-                else:
-                    amount_g = element["cdr_amount"]
-
-                partner_cost = decimal.Decimal(
-                    partner.cost_per_tonne * amount_g / (1000 * 1000)
-                )
-
-                element["cost"] = math.ceil(
-                    partner_cost * currency_conversion_rate.rate
+                element["cost"] = removal_method_calculate_cost(
+                    removal_method_slug=element["method_type"],
+                    currency=input.validated_data.get("currency"),
+                    cdr_weight=element["cdr_amount"],
+                    weight_unit=input.validated_data["weight_unit"],
                 )
                 return element
 
             items = list(map(calculate_cost, input.validated_data.get("items")))
             removal_cost = functools.reduce(lambda x, y: x + y["cost"], items, 0)
-            variable_fee = math.ceil(
-                removal_cost
-                * FEES["climacrux"]["variable_pct"]
-                / (100 - FEES["climacrux"]["variable_pct"])
-            )
+            variable_fee = variable_fees_calculate(removal_cost=removal_cost)
 
             output = self.OutputSerializer(
                 {
