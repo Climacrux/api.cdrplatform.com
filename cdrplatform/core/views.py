@@ -16,12 +16,12 @@ from .data import FEES
 from .models import (
     CurrencyChoices,
     CurrencyConversionRate,
-    OrganisationAPIKey,
     RemovalPartner,
     RemovalRequest,
     RemovalRequestItem,
     WeightUnitChoices,
 )
+from .selectors import api_key_get_from_key
 
 
 def removal_partner_list() -> Iterable[RemovalPartner]:
@@ -226,7 +226,7 @@ Returns a transaction ID that is unique to this removal request. This can
 be stored in your records and used to retrieve the status of the request,
 removal certificate
 
-**Note:** This will not return any """,
+**Note:** This will not return any prices, only a transaction UUID""",
     )
     def post(self, request):
         input = self.InputSerializer(data=request.data)
@@ -235,7 +235,7 @@ removal certificate
         # This means it will have the same error format as every other error 👍
         if input.is_valid(raise_exception=True):
             key = request.META["HTTP_AUTHORIZATION"].split()[1]
-            api_key = OrganisationAPIKey.objects.get_from_key(key)
+            api_key = api_key_get_from_key(key)
             removal_request = RemovalRequest.objects.create(
                 weight_unit=input.validated_data.get("weight_unit"),
                 requested_datetime=timezone.now(),
