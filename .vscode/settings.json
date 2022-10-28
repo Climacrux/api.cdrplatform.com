@@ -21,5 +21,11 @@
       // used for development only.
       "api-key": "Q3zEILSn.GccmbFZWCVqUsdzPr1LSR0JKMiBpgnfT"
     }
+  },
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    },
   }
 }
