@@ -198,6 +198,16 @@ class CDRRemovalView(BaseAPIView, UnauthenticatedMixin, APIKeyRequiredMixin):
             choices=CurrencyChoices.choices,
         )
         items = InputRemovalMethodSerializer(many=True, min_length=1)
+        client_reference_id = serializers.CharField(
+            required=False,
+            max_length=128,
+            allow_blank=True,
+        )
+        certificate_display_name = serializers.CharField(
+            required=False,
+            max_length=128,
+            allow_blank=True,
+        )
 
         def validate_items(self, value):
             counter = collections.Counter(map(lambda x: x["method_type"], value))
