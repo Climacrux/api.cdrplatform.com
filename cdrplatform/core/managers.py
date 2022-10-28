@@ -2,6 +2,9 @@ from django.apps import apps
 from django.contrib import auth
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.hashers import make_password
+from rest_framework_api_key.models import BaseAPIKeyManager
+
+from .crypto import TestKeyGenerator
 
 
 class CDRUserManager(BaseUserManager):
@@ -65,3 +68,13 @@ class CDRUserManager(BaseUserManager):
                 obj=obj,
             )
         return self.none()
+
+
+class TestAPIKeyManager(BaseAPIKeyManager):
+    """When generating test API keys then we want
+    to have a `test_` prefix. This enables us to easily
+    exclude these test API keys from invoice calculations
+    while also providing a human identifiable difference
+    that this is an API key for testing."""
+
+    key_generator = TestKeyGenerator()

@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework_api_key.models import AbstractAPIKey
 
-from cdrplatform.core.managers import CDRUserManager
+from cdrplatform.core.managers import CDRUserManager, TestAPIKeyManager
 
 
 def get_sentinel_user():
@@ -279,8 +279,15 @@ class OrganisationAPIKey(AbstractAPIKey):
     This is how we will tie API requests to an Organisation for billing.
     """
 
+    # prefix must be unique but if we prefix with `test_` make sure
+    # we have enough characters left to have a randomly unique string
+    prefix = models.CharField(max_length=13, unique=True, editable=False)
     organisation = models.ForeignKey(
         CustomerOrganisation,
         on_delete=models.CASCADE,
         related_name="api_keys",
     )
+
+    # Used for interacting with Test API keys
+    # e.g. OrganisationAPIKey.test_objects.create_key()
+    test_objects = TestAPIKeyManager()
