@@ -235,6 +235,30 @@ class RemovalRequest(models.Model):
     def __str__(self) -> str:
         return f"{self.uuid}"
 
+    @property
+    def removal_cost(self) -> int:
+        """Helper function to sum all the request items for the
+        total removal cost."""
+        q = self.items.aggregate(models.Sum("cdr_cost"))
+        return q["cdr_cost__sum"]
+
+    @property
+    def variable_fees(self) -> int:
+        """Helper function to sum all the request items for the
+        total variable_fees."""
+        q = self.items.aggregate(models.Sum("variable_fees"))
+        return q["variable_fees__sum"]
+
+    @property
+    def total_cost(self) -> int:
+        """Helper function to sum all the request items for the
+        total cost."""
+        q = self.items.aggregate(
+            models.Sum("variable_fees"),
+            models.Sum("cdr_cost"),
+        )
+        return q["cdr_cost__sum"] + q["variable_fees__sum"]
+
 
 class RemovalRequestItem(models.Model):
     removal_partner = models.ForeignKey(
@@ -245,6 +269,8 @@ class RemovalRequestItem(models.Model):
     removal_request = models.ForeignKey(
         "RemovalRequest",
         on_delete=models.CASCADE,
+        related_name="items",
+        related_query_name="item",
     )
     # cost in smallest denomination of :class:`RemovalRequest` currency
     # e.g. in cents for USD; rappen for CHF etc; pence for GBP etc.
@@ -256,6 +282,12 @@ class RemovalRequestItem(models.Model):
 
     def __str__(self) -> str:
         return f"{self.pk}"
+
+    @property
+    def total_cost(self) -> int:
+        """Helper function to return the total cost (cdr_cost + variable_fees)
+        for this item."""
+        return self.cdr_cost + self.variable_fees
 
 
 class CurrencyConversionRate(models.Model):
