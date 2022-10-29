@@ -56,14 +56,23 @@ def partner_cost_calculate(*, partner: RemovalPartner, cdr_weight_g: int) -> Dec
     return Decimal(partner.cost_per_tonne * cdr_weight_g / (1000 * 1000))
 
 
-def removal_method_calculate_cost(
+def removal_method_calculate_removal_cost(
     *,
     removal_method_slug: str,
     currency: CurrencyChoices,
     cdr_weight: int,
     weight_unit: WeightUnitChoices,
 ) -> int:
-    """"""
+    """For a given removal method, lookup the corresponding partner
+    (we only have one partner per removal method at this time) and
+    calculate the removal cost for the given weight in the respective
+    currency.
+
+    Currency is required as we convert from the native partner currency
+    into the requested currency.
+
+    Note: This does not include fees, it is purely the removal cost.
+    """
 
     partner = removal_partner_get_from_method_slug(method_slug=removal_method_slug)
     currency_conversion_rate = currency_conversion_rate_get_latest(

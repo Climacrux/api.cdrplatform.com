@@ -19,7 +19,7 @@ from .models import (
 )
 from .selectors import (
     api_key_get_from_key,
-    removal_method_calculate_cost,
+    removal_method_calculate_removal_cost,
     removal_partner_get_from_method_slug,
     variable_fees_calculate,
 )
@@ -116,7 +116,7 @@ fees for a future CO₂ removal purchase.""",
         if input.is_valid(raise_exception=True):
 
             def calculate_cost(element):
-                element["cost"] = removal_method_calculate_cost(
+                element["cost"] = removal_method_calculate_removal_cost(
                     removal_method_slug=element["method_type"],
                     currency=input.validated_data.get("currency"),
                     cdr_weight=element["cdr_amount"],
