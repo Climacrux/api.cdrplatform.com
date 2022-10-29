@@ -249,6 +249,7 @@ class RemovalRequestItem(models.Model):
     # cost in smallest denomination of :class:`RemovalRequest` currency
     # e.g. in cents for USD; rappen for CHF etc; pence for GBP etc.
     cdr_cost = models.PositiveIntegerField()
+    variable_fees = models.PositiveIntegerField()
     # amount of CDR in unit defined in related :class:`RemovalRequest`
     # e.g. 5t; 100g; 500kg; etc.
     cdr_amount = models.PositiveIntegerField()
