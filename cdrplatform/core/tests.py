@@ -166,6 +166,10 @@ class CDRRemovalViewTestCase(APIKeyMixin, APITestCase):
         """
         Ensure we can successfully request carbon removal.
         """
+
+        removal_requests = RemovalRequest.objects.filter(customer_organisation=self.org)
+        self.assertEqual(removal_requests.count(), 0)
+
         url = reverse("v1:cdr_request")
         data = {
             "weight_unit": "t",
@@ -177,9 +181,16 @@ class CDRRemovalViewTestCase(APIKeyMixin, APITestCase):
         uuid.UUID(
             response.data["transaction_uuid"]
         )  # this will raise an exception if not a valid UUID
+
         # We should have created one removal request for our org
         removal_requests = RemovalRequest.objects.filter(customer_organisation=self.org)
         self.assertEqual(removal_requests.count(), 1)
+
+        # The request should have stored the correct cdr amount, cost and variable fees
+        removal_request = removal_requests[0]
+        self.assertEqual(removal_request.removal_cost, 11040)
+        self.assertEqual(removal_request.variable_fees, 960)
+        self.assertEqual(removal_request.total_cost, 12000)
 
     def test_invalid_carbon_removal_request(self):
         """
@@ -234,6 +245,11 @@ class CDRRemovalViewTestCase(APIKeyMixin, APITestCase):
         self.assertEqual(removal_requests.first().uuid, transaction_uuid)
         # We should have created one removal request for our org
         self.assertEqual(removal_requests.count(), 1)
+        # The request should have stored the correct cdr amount, cost and variable fees
+        removal_request = removal_requests[0]
+        self.assertEqual(removal_request.removal_cost, 1211040)
+        self.assertEqual(removal_request.variable_fees, 105308)
+        self.assertEqual(removal_request.total_cost, 1316348)
 
         # Send another request and check we have the correct number of requests
         response = self.client.post(url, data)

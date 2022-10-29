@@ -227,11 +227,18 @@ removal certificate
                 removal_partner = removal_partner_get_from_method_slug(
                     method_slug=item["method_type"]
                 )
+                removal_cost = removal_method_calculate_removal_cost(
+                    removal_method_slug=item["method_type"],
+                    currency=input.validated_data.get("currency"),
+                    cdr_weight=item.get("cdr_amount"),
+                    weight_unit=input.validated_data.get("weight_unit"),
+                )
+                variable_fees = variable_fees_calculate(removal_cost=removal_cost)
                 RemovalRequestItem.objects.create(
                     removal_partner=removal_partner,
                     removal_request=removal_request,
-                    cdr_cost=0,
-                    variable_fees=0,
+                    cdr_cost=removal_cost,
+                    variable_fees=variable_fees,
                     cdr_amount=item.get("cdr_amount"),
                 )
             output = self.OutputSerializer({"transaction_uuid": removal_request.uuid})
