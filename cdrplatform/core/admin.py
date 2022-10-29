@@ -57,6 +57,7 @@ class RemovalRequestItemAdmin(admin.ModelAdmin):
         "removal_partner",
         "removal_request",
         "cdr_cost",
+        "variable_fees",
         "cdr_amount",
     )
 
