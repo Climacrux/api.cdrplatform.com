@@ -150,6 +150,7 @@ class RemovalPartner(models.Model):
     website = models.URLField()
     cost_per_tonne = models.PositiveIntegerField()
     currency = models.CharField(max_length=3, choices=CurrencyChoices.choices)
+    disabled = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return f"{self.pk} - {self.name}"
