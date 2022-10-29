@@ -231,6 +231,7 @@ removal certificate
                     removal_partner=removal_partner,
                     removal_request=removal_request,
                     cdr_cost=0,
+                    variable_fees=0,
                     cdr_amount=item.get("cdr_amount"),
                 )
             output = self.OutputSerializer({"transaction_uuid": removal_request.uuid})
