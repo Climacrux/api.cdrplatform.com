@@ -52,6 +52,7 @@
     website: https://www.edenprojects.org/
     cost_per_tonne: 552
     currency: usd
+    disabled: False
 - model: core.RemovalPartner
   pk: 2
   fields:
@@ -63,6 +64,7 @@
     website: https://climeworks.com/
     cost_per_tonne: 100161
     currency: chf
+    disabled: True
 - model: core.RemovalPartner
   pk: 3
   fields:
@@ -74,6 +76,7 @@
     website: https://charmindustrial.com/
     cost_per_tonne: 60000
     currency: usd
+    disabled: False
 - model: core.RemovalPartner
   pk: 4
   fields:
@@ -85,6 +88,7 @@
     website: https://www.runningtide.com/
     cost_per_tonne: 25000
     currency: usd
+    disabled: False
 - model: core.RemovalPartner
   pk: 5
   fields:
@@ -96,3 +100,4 @@
     website: https://greensand.com/
     cost_per_tonne: 10584
     currency: eur
+    disabled: False
