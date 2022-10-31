@@ -57,6 +57,32 @@ class CDRPricingViewTestCase(APIKeyMixin, APITestCase):
         )
         return super().setUpTestData()
 
+    def test_disabled_partner(self):
+        """
+        Ensure requesting the price of disabled partners is not possible.
+        """
+        url = reverse("v1:cdr_price")
+        data = {
+            "weight_unit": "t",
+            "currency": "chf",
+            "items": [{"method_type": "dacs", "cdr_amount": 10}],
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.data,
+            {
+                "type": "validation_error",
+                "errors": [
+                    {
+                        "code": "invalid_choice",
+                        "detail": '"dacs" is not a valid choice.',
+                        "attr": "items.0.method_type",
+                    }
+                ],
+            },
+        )
+
     def test_retrieve_price(self):
         """
         Ensure we can successfully retrieve a price.
@@ -161,6 +187,32 @@ class CDRRemovalViewTestCase(APIKeyMixin, APITestCase):
             )
         )
         return super().setUpTestData()
+
+    def test_disabled_partner(self):
+        """
+        Ensure requesting the removal of disabled partners is not possible.
+        """
+        url = reverse("v1:cdr_price")
+        data = {
+            "weight_unit": "t",
+            "currency": "chf",
+            "items": [{"method_type": "dacs", "cdr_amount": 10}],
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.data,
+            {
+                "type": "validation_error",
+                "errors": [
+                    {
+                        "code": "invalid_choice",
+                        "detail": '"dacs" is not a valid choice.',
+                        "attr": "items.0.method_type",
+                    }
+                ],
+            },
+        )
 
     def test_carbon_removal_request(self):
         """
