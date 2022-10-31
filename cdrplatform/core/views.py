@@ -26,7 +26,7 @@ from .selectors import (
 
 
 def removal_partner_list() -> Iterable[RemovalPartner]:
-    return RemovalPartner.objects.all()
+    return RemovalPartner.objects.filter(disabled=False)
 
 
 def removal_method_choices():
