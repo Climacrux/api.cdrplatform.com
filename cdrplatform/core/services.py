@@ -34,6 +34,8 @@ def removal_request_create(
     )
 
     for item in request_items:
+        # These items should be typed better but for now they need
+        # to have a `method_type` and `cdr_amount` attribute
         removal_partner = removal_partner_get_from_method_slug(
             method_slug=item.get("method_type")
         )
