@@ -1,10 +1,18 @@
 import uuid
+from datetime import timedelta
 
 from django.urls import reverse
 from django.utils import timezone
 from faker import Faker
 from rest_framework import status
 from rest_framework.test import APITestCase
+
+from cdrplatform.core.exceptions import (
+    APIKeyExpiredException,
+    APIKeyNotPresentOrRevoked,
+)
+from cdrplatform.core.selectors import api_key_must_be_present_and_valid
+from cdrplatform.core.services import api_key_create
 
 from .models import (
     CurrencyChoices,
@@ -30,13 +38,99 @@ class APIKeyMixin:
         # Create and save an API Key on the class to use later
         _, cls.apiKey = OrganisationAPIKey.objects.create_key(
             organisation=cls.org,
-            name="test-api-key",
+            name="api-key-for-testing",
         )
         return super().setUpTestData()
 
     def setUp(self) -> None:
         self.client.credentials(HTTP_AUTHORIZATION=f"Api-Key {self.apiKey}")
         return super().setUp()
+
+
+class APIKeyTestCase(APIKeyMixin, APITestCase):
+    def test_api_key_generation(self):
+        # We should have 1 key from the :class:`APIKeyMixin.setUp` method
+        self.assertEqual(OrganisationAPIKey.objects.count(), 1)
+        api_key, key = api_key_create(
+            organisation=self.org, api_key_name="api-key-for-testing"
+        )
+        # Check the length of the keys
+        self.assertEqual(len(api_key.prefix), 8)
+        self.assertEqual(len(key), 41)
+        self.assertEqual(OrganisationAPIKey.objects.count(), 2)
+
+    def test_test_api_key_generation(self):
+        api_key, key = api_key_create(
+            organisation=self.org,
+            api_key_name="test-api-key-for-testing",
+            test_key=True,
+        )
+        self.assertTrue(api_key.prefix.startswith("test_"))
+        self.assertTrue(key.startswith("test_"))
+        # Check that both objects and test_objects returns the key is valid
+        self.assertTrue(OrganisationAPIKey.test_objects.is_valid(key))
+        self.assertTrue(OrganisationAPIKey.objects.is_valid(key))
+        # The length of the test keys is different from the other keys
+        self.assertEqual(len(api_key.prefix), 13)
+        self.assertEqual(len(key), 46)
+        # Check that we have one key in the database that matches our prefix
+        self.assertEqual(
+            OrganisationAPIKey.objects.filter(prefix=api_key.prefix).count(),
+            1,
+        )
+
+    def test_api_key_generation_without_a_name(self):
+        api_key, key = api_key_create(
+            organisation=self.org,
+        )
+        # Check the length of the keys and an additional key
+        # was created in the database
+        self.assertEqual(len(api_key.prefix), 8)
+        self.assertEqual(len(key), 41)
+        self.assertEqual(OrganisationAPIKey.objects.count(), 2)
+
+    def test_api_key_generation_with_none_name(self):
+        api_key, key = api_key_create(
+            organisation=self.org,
+            api_key_name=None,
+        )
+        # Check the length of the keys and an additional key
+        # was created in the database
+        self.assertEqual(len(api_key.prefix), 8)
+        self.assertEqual(len(key), 41)
+        self.assertEqual(OrganisationAPIKey.objects.count(), 2)
+
+    def test_api_key_does_not_exist(self):
+        with self.assertRaises(APIKeyNotPresentOrRevoked):
+            api_key_must_be_present_and_valid(key="this-key-should-not-exist")
+
+    def test_api_key_is_expired(self):
+        # setup an expired api key and try to retrieve it
+        # setup an api key revoke it and try to retrieve it
+        api_key, key = api_key_create(
+            organisation=self.org,
+            api_key_name="test-api-key-for-testing--expired",
+        )
+        self.assertFalse(api_key.has_expired)
+        api_key.expiry_date = timezone.now() - timedelta(minutes=1)
+        api_key.save()
+        self.assertTrue(api_key.has_expired)
+
+        with self.assertRaises(APIKeyExpiredException):
+            api_key_must_be_present_and_valid(key=key)
+
+    def test_api_key_has_been_revoked(self):
+        # setup an api key revoke it and try to retrieve it
+        api_key, key = api_key_create(
+            organisation=self.org,
+            api_key_name="test-api-key-for-testing--revoked",
+        )
+
+        self.assertFalse(api_key.revoked)
+        api_key.revoked = True
+        api_key.save()
+        with self.assertRaises(APIKeyNotPresentOrRevoked):
+            api_key_must_be_present_and_valid(key=key)
 
 
 class CDRPricingViewTestCase(APIKeyMixin, APITestCase):
@@ -56,6 +150,20 @@ class CDRPricingViewTestCase(APIKeyMixin, APITestCase):
             )
         )
         return super().setUpTestData()
+
+    def test_unknown_api_key_allowed(self):
+        """API keys aren't checked on the pricing endpoint so this should pass"""
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Api-Key im-a-key-that-does-not-exist"
+        )
+        url = reverse("v1:cdr_price")
+        data = {
+            "weight_unit": "t",
+            "currency": "chf",
+            "items": [{"method_type": "forestation", "cdr_amount": 10}],
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_retrieve_price(self):
         """
@@ -161,6 +269,32 @@ class CDRRemovalViewTestCase(APIKeyMixin, APITestCase):
             )
         )
         return super().setUpTestData()
+
+    def test_unknown_api_key_fails(self):
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Api-Key im-a-key-that-does-not-exist"
+        )
+        url = reverse("v1:cdr_request")
+        data = {
+            "weight_unit": "t",
+            "currency": "chf",
+            "items": [{"method_type": "forestation", "cdr_amount": 10}],
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(
+            response.data,
+            {
+                "type": "client_error",
+                "errors": [
+                    {
+                        "code": "authentication_failed",
+                        "detail": "API Key does not exist or has been revoked",
+                        "attr": None,
+                    }
+                ],
+            },
+        )
 
     def test_carbon_removal_request(self):
         """

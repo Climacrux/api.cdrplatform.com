@@ -1,6 +1,6 @@
 from django.urls import include, path
 
-from .views import CDRPricingView, CDRRemovalView
+from .views import CDRPricingView, CDRRemovalView, HealthView
 
 app_name = "core"
 
@@ -11,4 +11,5 @@ cdr_routes = [
 
 urlpatterns = [
     path("cdr/", include(cdr_routes)),
+    path("health/", HealthView.as_view(), name="health_check"),
 ]

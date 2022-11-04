@@ -1,9 +1,15 @@
 import math
 from decimal import Decimal
+from typing import Optional
 
 from rest_framework import serializers
 
 from cdrplatform.core.data import FEES
+from cdrplatform.core.exceptions import (
+    APIKeyExpiredException,
+    APIKeyNotPresentOrRevoked,
+    MissingData,
+)
 
 from .models import (
     CurrencyChoices,
@@ -14,14 +20,38 @@ from .models import (
 )
 
 
-def api_key_get_from_key(*, key: str):
+def api_key_get_from_key(*, key: str) -> OrganisationAPIKey:
     try:
-        return OrganisationAPIKey.objects.get_from_key(key)
+        return OrganisationAPIKey.objects.get_from_key(key=key)
     except OrganisationAPIKey.DoesNotExist:
         raise  # be explicit
 
 
-def removal_partner_get_from_method_slug(*, method_slug: str) -> RemovalPartner:
+def api_key_must_be_present_and_valid(
+    *,
+    key: str,
+) -> OrganisationAPIKey:
+    """Tries to look up an API key and raises an exception if one
+    of the following occurs:
+
+    - Key not present: :class:`APIKeyNotPresentOrRevoked`
+    - Key revoked: :class:`APIKeyNotPresentOrRevoked`
+    - Key expired: :class:`APIKeyExpiredException`
+    """
+    try:
+        api_key = api_key_get_from_key(key=key)
+    except OrganisationAPIKey.DoesNotExist:
+        raise APIKeyNotPresentOrRevoked
+
+    if api_key.has_expired or api_key.revoked:
+        raise APIKeyExpiredException
+    return api_key
+
+
+def removal_partner_get_from_method_slug(
+    *,
+    method_slug: str,
+) -> RemovalPartner:
     try:
         return RemovalPartner.objects.get(removal_method__slug=method_slug)
     except RemovalPartner.DoesNotExist:
@@ -41,26 +71,27 @@ def currency_conversion_rate_get_latest(
     ).first()  # Limit to 1 record to get the latest conversion rate
 
 
-def cdr_weight_get_in_grams(*, cdr_weight: int, weight_unit: WeightUnitChoices) -> int:
+def cdr_weight_get_in_grams(*, cdr_amount: int, weight_unit: WeightUnitChoices) -> int:
     if weight_unit == "t":
-        cdr_weight_g = cdr_weight * 1000 * 1000
+        cdr_amount_g = cdr_amount * 1000 * 1000
     elif weight_unit == "kg":
-        cdr_weight_g = cdr_weight_g * 1000
+        cdr_amount_g = cdr_amount_g * 1000
     else:
-        cdr_weight_g = cdr_weight
+        cdr_amount_g = cdr_amount
 
-    return cdr_weight_g
+    return cdr_amount_g
 
 
-def partner_cost_calculate(*, partner: RemovalPartner, cdr_weight_g: int) -> Decimal:
-    return Decimal(partner.cost_per_tonne * cdr_weight_g / (1000 * 1000))
+def partner_cost_calculate(*, partner: RemovalPartner, cdr_amount_g: int) -> Decimal:
+    return Decimal(partner.cost_per_tonne * cdr_amount_g / (1000 * 1000))
 
 
 def removal_method_calculate_removal_cost(
     *,
-    removal_method_slug: str,
+    removal_partner: Optional[RemovalPartner] = None,
+    removal_method_slug: Optional[str] = None,
     currency: CurrencyChoices,
-    cdr_weight: int,
+    cdr_amount: int,
     weight_unit: WeightUnitChoices,
 ) -> int:
     """For a given removal method, lookup the corresponding partner
@@ -74,22 +105,30 @@ def removal_method_calculate_removal_cost(
     Note: This does not include fees, it is purely the removal cost.
     """
 
-    partner = removal_partner_get_from_method_slug(method_slug=removal_method_slug)
+    if removal_partner is None and removal_method_slug is None:
+        raise MissingData
+
+    _partner = removal_partner
+    if removal_partner is None:
+        _partner = removal_partner_get_from_method_slug(
+            method_slug=removal_method_slug,
+        )
+
     currency_conversion_rate = currency_conversion_rate_get_latest(
-        from_currency=partner.currency,
+        from_currency=_partner.currency,
         to_currency=currency,
     )
 
     if currency_conversion_rate is None:
         raise serializers.ValidationError(
-            f'Unable to convert partner currency "{partner.currency}"'
+            f'Unable to convert partner currency "{_partner.currency}"'
             + f' to "{input.validated_data.get("currency")}"'
         )
 
     partner_cost = partner_cost_calculate(
-        partner=partner,
-        cdr_weight_g=cdr_weight_get_in_grams(
-            cdr_weight=cdr_weight, weight_unit=weight_unit
+        partner=_partner,
+        cdr_amount_g=cdr_weight_get_in_grams(
+            cdr_amount=cdr_amount, weight_unit=weight_unit
         ),
     )
 

@@ -2,6 +2,8 @@ import collections
 import functools
 from typing import Iterable
 
+from django.db import connections
+from django.db.utils import OperationalError
 from django.utils import timezone
 from django.utils.functional import lazy
 from drf_spectacular.utils import extend_schema, extend_schema_serializer
@@ -18,7 +20,7 @@ from .models import (
     WeightUnitChoices,
 )
 from .selectors import (
-    api_key_get_from_key,
+    api_key_must_be_present_and_valid,
     removal_method_calculate_removal_cost,
     removal_partner_get_from_method_slug,
     variable_fees_calculate,
@@ -119,7 +121,7 @@ fees for a future CO₂ removal purchase.""",
                 element["cost"] = removal_method_calculate_removal_cost(
                     removal_method_slug=element["method_type"],
                     currency=input.validated_data.get("currency"),
-                    cdr_weight=element["cdr_amount"],
+                    cdr_amount=element["cdr_amount"],
                     weight_unit=input.validated_data["weight_unit"],
                 )
                 return element
@@ -210,13 +212,14 @@ removal certificate
 **Note:** This will not return any prices, only a transaction UUID""",
     )
     def post(self, request):
+        key = request.META["HTTP_AUTHORIZATION"].split()[1]
+        api_key = api_key_must_be_present_and_valid(key=key)
+
         input = self.InputSerializer(data=request.data)
         # We raise an exception if the data is invalid because it will be automatically
         # caught and handled by drf-standardized-errors.
         # This means it will have the same error format as every other error 👍
         if input.is_valid(raise_exception=True):
-            key = request.META["HTTP_AUTHORIZATION"].split()[1]
-            api_key = api_key_get_from_key(key=key)
             removal_request = RemovalRequest.objects.create(
                 weight_unit=input.validated_data.get("weight_unit"),
                 requested_datetime=timezone.now(),
@@ -230,7 +233,7 @@ removal certificate
                 removal_cost = removal_method_calculate_removal_cost(
                     removal_method_slug=item["method_type"],
                     currency=input.validated_data.get("currency"),
-                    cdr_weight=item.get("cdr_amount"),
+                    cdr_amount=item.get("cdr_amount"),
                     weight_unit=input.validated_data.get("weight_unit"),
                 )
                 variable_fees = variable_fees_calculate(removal_cost=removal_cost)
@@ -243,3 +246,35 @@ removal certificate
                 )
             output = self.OutputSerializer({"transaction_uuid": removal_request.uuid})
             return Response(output.data, status=status.HTTP_201_CREATED)
+
+
+class HealthView(BaseAPIView):
+    """Health endpoint used to check DB connection, liveness etc."""
+
+    db_conns_to_check = ("default",)
+
+    class OutputSerializer(serializers.Serializer):
+        db_up = serializers.DictField()
+
+    def has_db_connection(self, db_name: str = "default") -> bool:
+        db_conn = connections[db_name]
+        try:
+            _ = db_conn.cursor()
+        except OperationalError:
+            connected = False
+        else:
+            connected = True
+        return connected
+
+    def get(self, request):
+        db_conn_info = {}
+        status_code = status.HTTP_200_OK
+        for db in self.db_conns_to_check:
+            db_up = self.has_db_connection(db)
+            db_conn_info[db] = db_up
+
+            if not db_up:
+                status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+
+        output = self.OutputSerializer({"db_up": db_conn_info})
+        return Response(output.data, status=status_code)

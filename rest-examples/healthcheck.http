@@ -1,0 +1,3 @@
+# Makes a request to the Health endpoint
+GET {{host}}/v1/health/ HTTP/1.1
+content-type: application/json
