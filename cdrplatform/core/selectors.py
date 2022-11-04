@@ -4,6 +4,7 @@ from typing import Iterable, Optional
 
 from rest_framework import serializers
 
+from cdrplatform.core.crypto import TestKeyGenerator
 from cdrplatform.core.data import FEES
 from cdrplatform.core.exceptions import (
     APIKeyExpiredException,
@@ -14,10 +15,36 @@ from cdrplatform.core.exceptions import (
 from .models import (
     CurrencyChoices,
     CurrencyConversionRate,
+    CustomerOrganisation,
     OrganisationAPIKey,
     RemovalPartner,
     WeightUnitChoices,
 )
+
+
+def api_key_list_all(
+    *,
+    org: CustomerOrganisation,
+) -> Iterable[OrganisationAPIKey]:
+    return OrganisationAPIKey.objects.filter(organisation=org)
+
+
+def api_key_list_test_only(
+    *,
+    org: CustomerOrganisation,
+) -> Iterable[OrganisationAPIKey]:
+    return api_key_list_all(org=org).filter(
+        prefix__istartswith=TestKeyGenerator.test_prefix,
+    )
+
+
+def api_key_list_prod_only(
+    *,
+    org: CustomerOrganisation,
+) -> Iterable[OrganisationAPIKey]:
+    return api_key_list_all(org=org).exclude(
+        prefix__istartswith=TestKeyGenerator.test_prefix,
+    )
 
 
 def api_key_get_from_key(*, key: str) -> OrganisationAPIKey:

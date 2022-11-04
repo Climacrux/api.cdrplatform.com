@@ -11,7 +11,12 @@ from cdrplatform.core.exceptions import (
     APIKeyExpiredException,
     APIKeyNotPresentOrRevoked,
 )
-from cdrplatform.core.selectors import api_key_must_be_present_and_valid
+from cdrplatform.core.selectors import (
+    api_key_list_all,
+    api_key_list_prod_only,
+    api_key_list_test_only,
+    api_key_must_be_present_and_valid,
+)
 from cdrplatform.core.services import api_key_create
 
 from .models import (
@@ -58,6 +63,7 @@ class APIKeyTestCase(APIKeyMixin, APITestCase):
         self.assertEqual(len(api_key.prefix), 8)
         self.assertEqual(len(key), 41)
         self.assertEqual(OrganisationAPIKey.objects.count(), 2)
+        self.assertEqual(api_key_list_all(org=self.org).count(), 2)
 
     def test_test_api_key_generation(self):
         api_key, key = api_key_create(
@@ -78,6 +84,9 @@ class APIKeyTestCase(APIKeyMixin, APITestCase):
             OrganisationAPIKey.objects.filter(prefix=api_key.prefix).count(),
             1,
         )
+        # We should have one production & one test api key
+        self.assertEqual(api_key_list_prod_only(org=self.org).count(), 1)
+        self.assertEqual(api_key_list_test_only(org=self.org).count(), 1)
 
     def test_api_key_generation_without_a_name(self):
         api_key, key = api_key_create(
@@ -87,7 +96,8 @@ class APIKeyTestCase(APIKeyMixin, APITestCase):
         # was created in the database
         self.assertEqual(len(api_key.prefix), 8)
         self.assertEqual(len(key), 41)
-        self.assertEqual(OrganisationAPIKey.objects.count(), 2)
+        self.assertEqual(api_key_list_all(org=self.org).count(), 2)
+        self.assertEqual(api_key_list_prod_only(org=self.org).count(), 2)
 
     def test_api_key_generation_with_none_name(self):
         api_key, key = api_key_create(
@@ -99,6 +109,9 @@ class APIKeyTestCase(APIKeyMixin, APITestCase):
         self.assertEqual(len(api_key.prefix), 8)
         self.assertEqual(len(key), 41)
         self.assertEqual(OrganisationAPIKey.objects.count(), 2)
+        # There should now be 2 api keys for the organisation
+        self.assertEqual(api_key_list_all(org=self.org).count(), 2)
+        self.assertEqual(api_key_list_prod_only(org=self.org).count(), 2)
 
     def test_api_key_does_not_exist(self):
         with self.assertRaises(APIKeyNotPresentOrRevoked):
@@ -119,6 +132,9 @@ class APIKeyTestCase(APIKeyMixin, APITestCase):
         with self.assertRaises(APIKeyExpiredException):
             api_key_must_be_present_and_valid(key=key)
 
+        # There should now be 2 api keys for the organisation
+        self.assertEqual(api_key_list_all(org=self.org).count(), 2)
+
     def test_api_key_has_been_revoked(self):
         # setup an api key revoke it and try to retrieve it
         api_key, key = api_key_create(
@@ -131,6 +147,9 @@ class APIKeyTestCase(APIKeyMixin, APITestCase):
         api_key.save()
         with self.assertRaises(APIKeyNotPresentOrRevoked):
             api_key_must_be_present_and_valid(key=key)
+
+        # There should now be 2 api keys for the organisation
+        self.assertEqual(api_key_list_all(org=self.org).count(), 2)
 
 
 class CDRPricingViewTestCase(APIKeyMixin, APITestCase):
