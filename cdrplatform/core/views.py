@@ -4,25 +4,19 @@ from typing import Iterable
 
 from django.db import connections
 from django.db.utils import OperationalError
-from django.utils import timezone
 from django.utils.functional import lazy
 from drf_spectacular.utils import extend_schema, extend_schema_serializer
 from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from cdrplatform.core.services import removal_request_create
+
 from .auth import APIKeyRequiredMixin, UnauthenticatedMixin
-from .models import (
-    CurrencyChoices,
-    RemovalPartner,
-    RemovalRequest,
-    RemovalRequestItem,
-    WeightUnitChoices,
-)
+from .models import CurrencyChoices, RemovalPartner, WeightUnitChoices
 from .selectors import (
     api_key_must_be_present_and_valid,
     removal_method_calculate_removal_cost,
-    removal_partner_get_from_method_slug,
     variable_fees_calculate,
 )
 
@@ -220,30 +214,14 @@ removal certificate
         # caught and handled by drf-standardized-errors.
         # This means it will have the same error format as every other error 👍
         if input.is_valid(raise_exception=True):
-            removal_request = RemovalRequest.objects.create(
+
+            removal_request = removal_request_create(
                 weight_unit=input.validated_data.get("weight_unit"),
-                requested_datetime=timezone.now(),
                 currency=input.validated_data.get("currency"),
-                customer_organisation_id=api_key.organisation_id,
+                org_id=api_key.organisation_id,
+                request_items=input.validated_data.get("items"),
             )
-            for item in input.validated_data.get("items"):
-                removal_partner = removal_partner_get_from_method_slug(
-                    method_slug=item["method_type"]
-                )
-                removal_cost = removal_method_calculate_removal_cost(
-                    removal_method_slug=item["method_type"],
-                    currency=input.validated_data.get("currency"),
-                    cdr_amount=item.get("cdr_amount"),
-                    weight_unit=input.validated_data.get("weight_unit"),
-                )
-                variable_fees = variable_fees_calculate(removal_cost=removal_cost)
-                RemovalRequestItem.objects.create(
-                    removal_partner=removal_partner,
-                    removal_request=removal_request,
-                    cdr_cost=removal_cost,
-                    variable_fees=variable_fees,
-                    cdr_amount=item.get("cdr_amount"),
-                )
+
             output = self.OutputSerializer({"transaction_uuid": removal_request.uuid})
             return Response(output.data, status=status.HTTP_201_CREATED)
 

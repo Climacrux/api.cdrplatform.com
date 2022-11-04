@@ -34,7 +34,9 @@ def removal_request_create(
     )
 
     for item in request_items:
-        removal_partner = removal_partner_get_from_method_slug(item.get("method_type"))
+        removal_partner = removal_partner_get_from_method_slug(
+            method_slug=item.get("method_type")
+        )
 
         removal_request_item_create(
             removal_partner=removal_partner,
@@ -55,7 +57,7 @@ def removal_request_item_create(
     removal_cost = removal_method_calculate_removal_cost(
         removal_partner=removal_partner,
         currency=removal_request.currency,
-        cdr_weight=cdr_amount,
+        cdr_amount=cdr_amount,
         weight_unit=removal_request.weight_unit,
     )
 
