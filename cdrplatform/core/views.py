@@ -1,6 +1,5 @@
 import collections
 import functools
-from typing import Iterable
 
 from django.db import connections
 from django.db.utils import OperationalError
@@ -13,16 +12,13 @@ from rest_framework.views import APIView
 from cdrplatform.core.services import removal_request_create
 
 from .auth import APIKeyRequiredMixin, UnauthenticatedMixin
-from .models import CurrencyChoices, RemovalPartner, WeightUnitChoices
+from .models import CurrencyChoices, WeightUnitChoices
 from .selectors import (
     api_key_must_be_present_and_valid,
     removal_method_calculate_removal_cost,
+    removal_partner_list,
     variable_fees_calculate,
 )
-
-
-def removal_partner_list() -> Iterable[RemovalPartner]:
-    return RemovalPartner.objects.all()
 
 
 def removal_method_choices():

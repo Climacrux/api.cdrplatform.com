@@ -1,6 +1,6 @@
 import math
 from decimal import Decimal
-from typing import Optional
+from typing import Iterable, Optional
 
 from rest_framework import serializers
 
@@ -56,6 +56,10 @@ def removal_partner_get_from_method_slug(
         return RemovalPartner.objects.get(removal_method__slug=method_slug)
     except RemovalPartner.DoesNotExist:
         raise  # be explicit
+
+
+def removal_partner_list() -> Iterable[RemovalPartner]:
+    return RemovalPartner.objects.all()
 
 
 def currency_conversion_rate_get_latest(
