@@ -1,15 +1,18 @@
 from django.urls import include, path
 
-from .views import HealthView, OrgSettingsAPIKeysView
+from .api.healthcheck import HealthView
+from .views.org.settings import APIKeysView
 
+# Namespaced with `settings` so when using URL names use something like
+# `core:org:settings:api_keys`
 org_settings_routes = (
     [
-        path("api-keys/", OrgSettingsAPIKeysView.as_view(), name="apikeys"),
+        path("api-keys/", APIKeysView.as_view(), name="api_keys"),
     ],
     "settings",
 )
 
-# Namespaced with 'org' so when using names use something like
+# Namespaced with 'org' so when using URL names use something like
 # `core:org:create`
 org_routes = (
     [

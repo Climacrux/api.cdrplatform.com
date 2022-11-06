@@ -1,6 +1,7 @@
 from django.urls import include, path
 
-from .views import CDRPricingView, CDRRemovalView
+from .api.cdr.pricing import CDRPricingView
+from .api.cdr.purchase import CDRRemovalView
 
 app_name = "core"
 

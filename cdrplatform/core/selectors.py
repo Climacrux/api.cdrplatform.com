@@ -117,6 +117,17 @@ def partner_cost_calculate(*, partner: RemovalPartner, cdr_amount_g: int) -> Dec
     return Decimal(partner.cost_per_tonne * cdr_amount_g / (1000 * 1000))
 
 
+def removal_method_choices():
+    try:
+        _partners = [
+            (m.removal_method.slug, m.removal_method.name)
+            for m in removal_partner_list().select_related("removal_method")
+        ]
+    except Exception:
+        _partners = tuple(tuple())
+    return _partners
+
+
 def removal_method_calculate_removal_cost(
     *,
     removal_partner: Optional[RemovalPartner] = None,
