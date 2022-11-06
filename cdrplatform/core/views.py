@@ -4,6 +4,7 @@ import functools
 from django.db import connections
 from django.db.utils import OperationalError
 from django.utils.functional import lazy
+from django.views.generic import TemplateView
 from drf_spectacular.utils import extend_schema, extend_schema_serializer
 from rest_framework import serializers, status
 from rest_framework.response import Response
@@ -252,3 +253,11 @@ class HealthView(BaseAPIView):
 
         output = self.OutputSerializer({"db_up": db_conn_info})
         return Response(output.data, status=status_code)
+
+
+class OrgSettingsAPIKeysView(TemplateView):
+    def get(self):
+        pass
+
+    def post(self):
+        pass

@@ -1,15 +1,24 @@
 from django.urls import include, path
 
-from .views import CDRPricingView, CDRRemovalView, HealthView
+from .views import HealthView, OrgSettingsAPIKeysView
 
-app_name = "core"
+org_settings_routes = (
+    [
+        path("api-keys/", OrgSettingsAPIKeysView.as_view(), name="apikeys"),
+    ],
+    "settings",
+)
 
-cdr_routes = [
-    path("price/", CDRPricingView.as_view(), name="cdr_price"),
-    path("", CDRRemovalView.as_view(), name="cdr_request"),
-]
+# Namespaced with 'org' so when using names use something like
+# `core:org:create`
+org_routes = (
+    [
+        path("settings/", include(org_settings_routes)),
+    ],
+    "org",
+)
 
 urlpatterns = [
-    path("cdr/", include(cdr_routes)),
+    path("org/", include(org_routes)),
     path("health/", HealthView.as_view(), name="health_check"),
 ]
