@@ -41,7 +41,7 @@ def api_key_list_test_only(
     org: CustomerOrganisation,
 ) -> Iterable[OrganisationAPIKey]:
     return api_key_list_all(org=org).filter(
-        prefix__istartswith=TestKeyGenerator.test_prefix,
+        prefix__istartswith=TestKeyGenerator.prefix,
     )
 
 
@@ -50,7 +50,7 @@ def api_key_list_prod_only(
     org: CustomerOrganisation,
 ) -> Iterable[OrganisationAPIKey]:
     return api_key_list_all(org=org).exclude(
-        prefix__istartswith=TestKeyGenerator.test_prefix,
+        prefix__istartswith=TestKeyGenerator.prefix,
     )
 
 

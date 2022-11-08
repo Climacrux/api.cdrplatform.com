@@ -4,7 +4,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.hashers import make_password
 from rest_framework_api_key.models import BaseAPIKeyManager
 
-from .crypto import TestKeyGenerator
+from .crypto import ProdKeyGenerator, TestKeyGenerator
 
 
 class CDRUserManager(BaseUserManager):
@@ -78,3 +78,9 @@ class TestAPIKeyManager(BaseAPIKeyManager):
     that this is an API key for testing."""
 
     key_generator = TestKeyGenerator()
+
+
+class ProdAPIKeyManager(BaseAPIKeyManager):
+    """Generates keys with the `prod_` prefix."""
+
+    key_generator = ProdKeyGenerator()

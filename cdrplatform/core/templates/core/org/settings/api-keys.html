@@ -7,7 +7,13 @@
 <h1>api-keys</h1>
 
 {% if key %}
-<h2>{{ key }}</h2>
+    <h2>Your API Key:</h2>
+
+    <code>{{key}}</code>
+
+    <p>
+        <strong>Note:</strong> Your API key will only be visible now, this one time. Please take a note of it now
+    </p>
 {% endif %}
 
 <p></p>
@@ -24,7 +30,7 @@
 
 <ul>
   {% for key in api_keys_prod %}
-  <li>{{ key.prefix }}</li>
+  <li>Name: {{key.name}} | Prefix: {{ key.prefix }}</li>
   {% empty %}
   <li>No production API keys</li>
   {% endfor %}
@@ -34,7 +40,7 @@
 
 <ul>
   {% for key in api_keys_test %}
-  <li>{{ key.prefix }}</li>
+  <li>Name: {{key.name}} | Prefix: {{ key.prefix }}</li>
   {% empty %}
   <li>No test API keys</li>
   {% endfor %}

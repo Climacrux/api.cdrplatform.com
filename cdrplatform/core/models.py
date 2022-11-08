@@ -10,7 +10,11 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework_api_key.models import AbstractAPIKey
 from shortuuid.django_fields import ShortUUIDField
 
-from cdrplatform.core.managers import CDRUserManager, TestAPIKeyManager
+from cdrplatform.core.managers import (
+    CDRUserManager,
+    ProdAPIKeyManager,
+    TestAPIKeyManager,
+)
 
 
 def get_sentinel_user():
@@ -336,6 +340,8 @@ class OrganisationAPIKey(AbstractAPIKey):
         on_delete=models.CASCADE,
         related_name="api_keys",
     )
+
+    objects = ProdAPIKeyManager()
 
     # Used for interacting with Test API keys
     # e.g. OrganisationAPIKey.test_objects.create_key()
