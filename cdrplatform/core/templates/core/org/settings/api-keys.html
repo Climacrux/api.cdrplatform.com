@@ -30,7 +30,7 @@
 
 <ul>
   {% for key in api_keys_prod %}
-  <li>Name: {{key.name}} | Prefix: {{ key.prefix }}</li>
+  <li>Name: {{key.name}} | Key prefix: <code>{{ key.prefix }}</code></li>
   {% empty %}
   <li>No production API keys</li>
   {% endfor %}
@@ -40,7 +40,7 @@
 
 <ul>
   {% for key in api_keys_test %}
-  <li>Name: {{key.name}} | Prefix: {{ key.prefix }}</li>
+  <li>Name: {{key.name}} | Key prefix: <code>{{ key.prefix }}</code></li>
   {% empty %}
   <li>No test API keys</li>
   {% endfor %}

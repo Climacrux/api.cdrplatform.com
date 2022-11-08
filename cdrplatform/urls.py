@@ -40,9 +40,7 @@ app_patterns = (
     ),
 )
 
-other_patterns = (
-    # path("accounts/", include(("django.contrib.auth.urls", "auth"))),
-)
+other_patterns = (path("accounts/", include(("django.contrib.auth.urls", "auth"))),)
 if settings.ENABLE_DJANGO_ADMIN:
     other_patterns += (path(settings.DJANGO_ADMIN_PATH, admin.site.urls),)
 

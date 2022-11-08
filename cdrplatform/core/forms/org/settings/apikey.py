@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class NewAPIKeyForm(forms.Form):
-    """A lightweight form used to"""
+    """A lightweight form used to create a new API key."""
 
     name = forms.CharField(
         required=True,

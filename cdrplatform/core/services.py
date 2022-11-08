@@ -137,3 +137,15 @@ def api_key_create_from_session(
     return api_key_create(
         organisation=org, api_key_name=api_key_name, test_key=test_key
     )
+
+
+def api_key_revoke(
+    *,
+    org: CustomerOrganisation,
+    key_prefix: str,
+):
+    """Expires a given API key based on the prefix and the organisation."""
+    _ = OrganisationAPIKey.objects.filter(prefix=key_prefix, organisation=org).update(
+        expiry_date=timezone.now()
+    )
+    return
