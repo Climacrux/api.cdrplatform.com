@@ -2,13 +2,18 @@ import math
 from decimal import Decimal
 from typing import Iterable, Optional
 
+from django.contrib.auth import get_user_model
+from django.http.request import HttpRequest
 from rest_framework import serializers
+from rest_framework.exceptions import PermissionDenied
 
+from cdrplatform.core.consts import SESSION_KEY_ORG_ID
 from cdrplatform.core.crypto import TestKeyGenerator
 from cdrplatform.core.data import FEES
 from cdrplatform.core.exceptions import (
     APIKeyExpiredException,
     APIKeyNotPresentOrRevoked,
+    CustomerOrganizationNotFound,
     MissingData,
 )
 
@@ -20,6 +25,8 @@ from .models import (
     RemovalPartner,
     WeightUnitChoices,
 )
+
+User = get_user_model()
 
 
 def api_key_list_all(
@@ -184,3 +191,32 @@ def variable_fees_calculate(*, removal_cost: int) -> int:
         * FEES["climacrux"]["variable_pct"]
         / (100 - FEES["climacrux"]["variable_pct"])
     )
+
+
+def customer_organisation_get_by_short_id(*, short_id: str) -> CustomerOrganisation:
+    return CustomerOrganisation.objects.filter(short_id=short_id)
+
+
+def customer_organisation_get_default(*, user: User) -> CustomerOrganisation:
+    """Returns the default organisation of a user. Currently just returns the
+    oldest organisation as we don't filter on default."""
+    return CustomerOrganisation.objects.filter(users=user).first()
+
+
+def customer_organisation_get_from_session(
+    *, request: HttpRequest
+) -> CustomerOrganisation:
+    """Looks up an organisation from a session. If not present
+    then uses the users default organisation."""
+    if not request.user.is_authenticated:
+        raise PermissionDenied
+    org_short_id = request.session.get(SESSION_KEY_ORG_ID)
+    if org_short_id is None:
+        org = customer_organisation_get_default(user=request.user)
+    else:
+        org = customer_organisation_get_by_short_id(short_id=org_short_id)
+
+    if org is None:
+        raise CustomerOrganizationNotFound
+
+    return org

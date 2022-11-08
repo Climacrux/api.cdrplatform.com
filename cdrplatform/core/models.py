@@ -1,5 +1,6 @@
 import uuid
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.core.mail import send_mail
@@ -7,6 +8,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework_api_key.models import AbstractAPIKey
+from shortuuid.django_fields import ShortUUIDField
 
 from cdrplatform.core.managers import CDRUserManager, TestAPIKeyManager
 
@@ -175,10 +177,23 @@ class Certificate(models.Model):
 
 
 class CustomerOrganisation(models.Model):
+    short_id = ShortUUIDField(
+        length=22,
+        max_length=40,
+        prefix="org_",
+        unique=True,
+    )
     organisation_name = models.CharField(max_length=64)
+    created_date = models.DateField(auto_now_add=True)
+    # Organisations can have multiple users and
+    # users can be part of multiple organisations
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL)
+
+    class Meta:
+        ordering = ("created_date",)
 
     def __str__(self) -> str:
-        return f"{self.organisation_name}"
+        return f"{self.short_id} - {self.organisation_name}"
 
 
 class RemovalMethod(models.Model):

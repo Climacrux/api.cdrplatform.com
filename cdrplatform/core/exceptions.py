@@ -1,5 +1,5 @@
 from django.utils.translation import gettext_lazy as _
-from rest_framework.exceptions import AuthenticationFailed, ValidationError
+from rest_framework.exceptions import AuthenticationFailed, NotFound, ValidationError
 
 
 class APIKeyExpiredException(AuthenticationFailed):
@@ -12,3 +12,7 @@ class APIKeyNotPresentOrRevoked(AuthenticationFailed):
 
 class MissingData(ValidationError):
     default_detail = _("Invalid data")
+
+
+class CustomerOrganizationNotFound(NotFound):
+    default_detail = _("Customer Organisation not found")
