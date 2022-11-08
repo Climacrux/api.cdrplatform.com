@@ -2,7 +2,42 @@
 
 {% block body %}
 
-    {% include 'core/org/settings/layout/navigation.html' %}
+{% include 'core/org/settings/layout/navigation.html' %}
 
-    <h1>api-keys</h1>
+<h1>api-keys</h1>
+
+{% if key %}
+<h2>{{ key }}</h2>
+{% endif %}
+
+<p></p>
+
+{% if form %}
+<form action="" method="post">
+  {% csrf_token %} {{ form }}
+
+  <input type="submit" value="Create Key" />
+</form>
+{% endif %}
+
+<h2>Production API keys</h2>
+
+<ul>
+  {% for key in api_keys_prod %}
+  <li>{{ key.prefix }}</li>
+  {% empty %}
+  <li>No production API keys</li>
+  {% endfor %}
+</ul>
+
+<h2>Test API keys</h2>
+
+<ul>
+  {% for key in api_keys_test %}
+  <li>{{ key.prefix }}</li>
+  {% empty %}
+  <li>No test API keys</li>
+  {% endfor %}
+</ul>
+
 {% endblock body %}
