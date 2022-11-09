@@ -71,7 +71,7 @@ class CDRPricingView(BaseAPIView, UnauthenticatedMixin, APIKeyRequiredMixin):
         )
 
     @extend_schema(
-        operation_id="Calculate price of CDR",
+        operation_id="CDRPrice",
         request=InputSerializer,
         responses={
             status.HTTP_201_CREATED: OutputSerializer,

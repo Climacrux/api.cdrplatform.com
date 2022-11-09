@@ -43,7 +43,7 @@ app_patterns = (
     path("", RedirectView.as_view(url=reverse_lazy("redoc"))),
     path("", include("cdrplatform.core.urls")),
     # Separate URLs file for API urls
-    path("v1", include("cdrplatform.core.urls_api", namespace="v1")),
+    path("v1/", include("cdrplatform.core.urls_api", namespace="v1")),
     # path("v2/", include("cdrplatform.core.urls_api", namespace="v2")),
     path("schema/", SpectacularAPIView.as_view(api_version="v1"), name="schema"),
     path(
