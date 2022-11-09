@@ -60,8 +60,8 @@ class APIKeyTestCase(APIKeyMixin, APITestCase):
             organisation=self.org, api_key_name="api-key-for-testing"
         )
         # Check the length of the keys
-        self.assertEqual(len(api_key.prefix), 8)
-        self.assertEqual(len(key), 41)
+        self.assertEqual(len(api_key.prefix), 13)
+        self.assertEqual(len(key), 46)
         self.assertEqual(OrganisationAPIKey.objects.count(), 2)
         self.assertEqual(api_key_list_all(org=self.org).count(), 2)
 
@@ -94,8 +94,8 @@ class APIKeyTestCase(APIKeyMixin, APITestCase):
         )
         # Check the length of the keys and an additional key
         # was created in the database
-        self.assertEqual(len(api_key.prefix), 8)
-        self.assertEqual(len(key), 41)
+        self.assertEqual(len(api_key.prefix), 13)
+        self.assertEqual(len(key), 46)
         self.assertEqual(api_key_list_all(org=self.org).count(), 2)
         self.assertEqual(api_key_list_prod_only(org=self.org).count(), 2)
 
@@ -106,8 +106,8 @@ class APIKeyTestCase(APIKeyMixin, APITestCase):
         )
         # Check the length of the keys and an additional key
         # was created in the database
-        self.assertEqual(len(api_key.prefix), 8)
-        self.assertEqual(len(key), 41)
+        self.assertEqual(len(api_key.prefix), 13)
+        self.assertEqual(len(key), 46)
         self.assertEqual(OrganisationAPIKey.objects.count(), 2)
         # There should now be 2 api keys for the organisation
         self.assertEqual(api_key_list_all(org=self.org).count(), 2)
