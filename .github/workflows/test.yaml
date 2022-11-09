@@ -1,0 +1,28 @@
+---
+name: Test & lint API
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: pipx install poetry
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'poetry'
+          architecture: 'x64'
+      - name: Install dependencies
+        run: poetry install
+      - name: Lint
+        run: poetry run flake8
+      - name: Run tests
+        run: poetry run ./manage.py test
