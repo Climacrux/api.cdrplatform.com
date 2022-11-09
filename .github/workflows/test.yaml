@@ -24,5 +24,7 @@ jobs:
         run: poetry install
       - name: Lint
         run: poetry run flake8
+      - name: Set up the testing environment variables
+        run: ln -s .env.dev .env
       - name: Run tests
         run: poetry run ./manage.py test
