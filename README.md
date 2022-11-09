@@ -56,6 +56,12 @@ $ poetry run ./manage.py loaddata removal_methods_partners
 
 _Todo_
 
+### Application monitoring
+
+We use new relic. When running on production ensure to run with following commands:
+$ NEW_RELIC_CONFIG_FILE=newrelic.ini newrelic-admin run-program
+$ $YOUR_COMMAND_OPTION
+
 ## Contact
 
 If you want to discuss CO2 removal; want to add [CDR Platform](https://cdrplatform.com) to your business;
