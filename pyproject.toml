@@ -39,6 +39,7 @@ pre-commit = "^2.20.0"
 flake8-django = "^1.1.5"
 django-debug-toolbar = "^3.7.0"
 Faker = "^15.1.1"
+safety = "^2.3.1"
 
 [tool.pylint.format]
 max-line-length = "88"

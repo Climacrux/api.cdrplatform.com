@@ -11,21 +11,56 @@ jobs:
   test:
     runs-on: ubuntu-22.04
     steps:
+
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Install poetry
         run: pipx install poetry
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
           cache: 'poetry'
           architecture: 'x64'
+
       - name: Install dependencies
         run: poetry install
+
       - name: Lint
-        run: poetry run flake8
+        run: poetry run flake8 .
+
+      # embed this into the CI itself but taken from:
+      # https://raw.githubusercontent.com/wemake-services/wemake-django-template/master/%7B%7Bcookiecutter.project_name%7D%7D/docker/django/ci.sh
+      - name: Check django settings
+        run: poetry run ./manage.py check --deploy --fail-level WARNING
+        env:
+          DJANGO_ENV: production
+
+      - name: Check django staticfiles app is working
+        run: poetry run ./manage.py collectstatic --no-input --dry-run
+        env:
+          DJANGO_ENV: production
+          DJANGO_COLLECTSTATIC_DRYRUN: 1
+
+      - name: Check django migrations would work
+        run: poetry run ./manage.py makemigrations --dry-run --check
+
+      - name: Check django migrations are backwards compatible
+        run: poetry run ./manage.py lintmigrations --warnings-as-errors
+
+      - name: Check poetry setup
+        run: poetry run poetry check
+
+      - name: Checking dependencies are secure and without any known vulnerabilities
+        run: poetry run safety check --full-report
+
+      - name: Check gunicorn production settings
+        run: gunicorn --check-config --config python:docker.django.gunicorn_config server.wsgi
+
       - name: Set up the testing environment variables
         run: ln -s .env.dev .env
+
       - name: Run tests
         run: poetry run ./manage.py test
