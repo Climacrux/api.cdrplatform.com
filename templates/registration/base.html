@@ -7,6 +7,15 @@
     <title>{% block title %}CDR Platform{% endblock title %}</title>
   </head>
   <body>
-    <div>{% block content %}{% endblock content %}</div>
+    <div>
+      {% if messages %}
+      <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      <div>{% block content %}{% endblock content %}</div>
+    </div>
   </body>
 </html>

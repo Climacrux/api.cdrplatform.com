@@ -1,7 +1,10 @@
 import django.contrib.auth.views as auth_views
+from django.contrib import messages
 from django.contrib.auth import login
+from django.db.utils import IntegrityError
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
+from django.utils.translation import gettext as _
 from django.views.generic import FormView
 
 from cdrplatform.core.forms.auth.registration import UserRegistrationForm
@@ -33,11 +36,17 @@ class UserRegisterView(auth_views.RedirectURLMixin, FormView):
 
     def form_valid(self, form) -> HttpResponse:
 
-        user = user_signup_with_default_customer_organisation(
-            name=form.cleaned_data.get("name"),
-            email=form.cleaned_data.get("email"),
-            password=form.cleaned_data.get("password"),
-        )
+        try:
+            user = user_signup_with_default_customer_organisation(
+                name=form.cleaned_data.get("name"),
+                email=form.cleaned_data.get("email"),
+                password=form.cleaned_data.get("password"),
+            )
+        except IntegrityError:
+            # If we get a DB integrity error it's likely because the email
+            # already addresses to show a message and show this page again
+            messages.error(self.request, _("A user with this email already exists"))
+            return self.render_to_response(self.get_context_data())
 
         login(request=self.request, user=user)
 
