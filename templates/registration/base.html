@@ -9,9 +9,11 @@
   <body>
     <div>
       {% if messages %}
-      <ul>
+      <ul class="messages">
         {% for message in messages %}
-        <li>{{ message }}</li>
+        <li class="message {% if message.tags %} {{ message.tags }}{% endif %}">
+          {{ message }}
+        </li>
         {% endfor %}
       </ul>
       {% endif %}
