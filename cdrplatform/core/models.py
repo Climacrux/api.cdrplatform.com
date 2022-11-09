@@ -136,7 +136,7 @@ class PartnerConfirmation(models.Model):
         on_delete=models.CASCADE,
     )
     confirmation_id = models.CharField(max_length=64)
-    confirmation_url = models.URLField(null=True)
+    confirmation_url = models.URLField(blank=True)
     confirmation_file = models.FileField(null=True)
     confirmation_image = models.ImageField(null=True)
 
