@@ -7,6 +7,7 @@
     "Ewan",
     "loaddata",
     "Organisation",
+    "organisations",
     "psycopg",
     "runserver",
     "WHITENOISE"

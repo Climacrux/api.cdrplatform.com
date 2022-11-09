@@ -15,12 +15,28 @@ Including another URLconf
 """
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from django.urls import include, path, reverse_lazy
 from django.views.generic.base import RedirectView
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
     SpectacularSwaggerView,
+)
+
+from cdrplatform.core.views.auth.registration import UserRegisterView
+
+auth_patterns = (
+    path(
+        "login/",
+        auth_views.LoginView.as_view(redirect_authenticated_user=True),
+        name="login",
+    ),
+    path(
+        "register/",
+        UserRegisterView.as_view(redirect_authenticated_user=True),
+        name="register",
+    ),
 )
 
 app_patterns = (
@@ -40,7 +56,8 @@ app_patterns = (
     ),
 )
 
-other_patterns = (path("accounts/", include(("django.contrib.auth.urls", "auth"))),)
+other_patterns = (path("accounts/", include((auth_patterns, "auth"))),)
+
 if settings.ENABLE_DJANGO_ADMIN:
     other_patterns += (path(settings.DJANGO_ADMIN_PATH, admin.site.urls),)
 

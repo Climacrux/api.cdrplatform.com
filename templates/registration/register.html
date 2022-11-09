@@ -1,12 +1,8 @@
 {% extends "registration/base.html" %}
 
-{% block title %}Login | CDR Platform{% endblock title %}
+{% block title %}Register | CDR Platform{% endblock title %}
 
 {% block content %}
-
-{% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
-{% endif %}
 
 {% if next %}
     {% if user.is_authenticated %}
@@ -17,17 +13,17 @@
     {% endif %}
 {% endif %}
 
-<form action="{% url 'auth:login' %}" method="post">
+<form action="{% url 'auth:register' %}" method="post">
 
     {% csrf_token %}
 
     {{ form }}
 
-    <input type="submit" value="login">
+    <input type="submit" value="Sign Up">
     <input type="hidden" name="next" value="{{ next }}">
 
 </form>
 
-<p><a href="{% url 'auth:register' %}">Register</a></p>
+<p><a href="{% url 'auth:login' %}">Login</a></p>
 
 {% endblock content %}

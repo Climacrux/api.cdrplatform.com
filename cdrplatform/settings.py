@@ -151,6 +151,9 @@ PASSWORD_HASHERS = ["cdrplatform.core.hashers.CDRPlatformArgon2PasswordHasher"]
 
 AUTH_USER_MODEL = "core.CDRUser"
 
+# Todo: replace or remove this when more complex routes are available
+LOGIN_REDIRECT_URL = "/org/settings/api-keys/"
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/

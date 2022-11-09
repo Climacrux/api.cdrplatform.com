@@ -191,7 +191,10 @@ class CustomerOrganisation(models.Model):
     created_date = models.DateField(auto_now_add=True)
     # Organisations can have multiple users and
     # users can be part of multiple organisations
-    users = models.ManyToManyField(settings.AUTH_USER_MODEL)
+    users = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name="organisations",
+    )  # look up with `user.organisations`
 
     class Meta:
         ordering = ("created_date",)

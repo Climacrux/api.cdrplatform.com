@@ -14,6 +14,7 @@ from cdrplatform.core.selectors import (
 )
 
 from .models import (
+    CDRUser,
     CurrencyChoices,
     CustomerOrganisation,
     OrganisationAPIKey,
@@ -24,6 +25,19 @@ from .models import (
 )
 
 User = get_user_model()
+
+
+def user_signup_with_default_customer_organisation(
+    *,
+    name: str,
+    email: str,
+    password: str,
+):
+
+    new_user = CDRUser.objects.create_user(name=name, email=email, password=password)
+    new_user.organisations.create(organisation_name="Default")
+
+    return new_user
 
 
 def removal_request_create(
