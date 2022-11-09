@@ -31,6 +31,9 @@ jobs:
       - name: Lint
         run: poetry run flake8 .
 
+      - name: Set up the testing environment variables
+        run: ln -s .env.dev .env
+
       # embed this into the CI itself but taken from:
       # https://raw.githubusercontent.com/wemake-services/wemake-django-template/master/%7B%7Bcookiecutter.project_name%7D%7D/docker/django/ci.sh
       - name: Check django settings
@@ -58,9 +61,6 @@ jobs:
 
       - name: Check gunicorn production settings
         run: gunicorn --check-config --config python:docker.django.gunicorn_config server.wsgi
-
-      - name: Set up the testing environment variables
-        run: ln -s .env.dev .env
 
       - name: Run tests
         run: poetry run ./manage.py test
