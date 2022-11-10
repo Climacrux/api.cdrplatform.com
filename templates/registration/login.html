@@ -1,28 +1,10 @@
 {% extends "registration/base.html" %}
 
-{% block title %}Login | CDR Platform{%endblock title %} {% block content %} {% comment %}
-<div class="max-w-lg flex flex-col">
-  {% if form.errors %}
-  <p>Your username and password didn't match. Please try again.</p>
-  {% endif %} {% if next %} {% if user.is_authenticated %}
-  <p>
-    Your account doesn't have access to this page. To proceed, please login with
-    an account that has access.
-  </p>
-  {% else %}
-  <p>Please login to see this page.</p>
-  {% endif %} {% endif %}
+{% block title %}Login | CDR Platform{%endblock title %}
 
-  <form action="{% url 'auth:login' %}" method="post" class="flex flex-col">
-    {% csrf_token %} {{ form }}
+{% block content %}
 
-    <input type="submit" value="login" />
-    <input type="hidden" name="next" value="{{ next }}" />
-  </form>
-
-  <p><a href="{% url 'auth:register' %}">Register</a></p>
-</div>
-{% endcomment %}
+{% load static %}
 
 <div
   class="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
@@ -30,9 +12,9 @@
   <div class="w-full max-w-md space-y-8">
     <div>
       <img
-        class="mx-auto h-12 w-auto"
-        src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-        alt="Your Company"
+        class="mx-auto h-14 w-auto"
+        src="{% static 'img/logo--square--colour.svg' %}"
+        alt="Climacrux LLC"
       />
       <h2
         class="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900"
@@ -66,30 +48,6 @@
             {{field}}
         </div>
         {% endfor %}
-      </div>
-
-      <div class="flex items-center justify-between">
-        {% comment %}
-        <div class="flex items-center">
-          <input
-            id="remember-me"
-            name="remember-me"
-            type="checkbox"
-            class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-          />
-          <label for="remember-me" class="ml-2 block text-sm text-gray-900"
-            >Remember me</label
-          >
-        </div>
-        {% endcomment %} {% comment %}
-        <div class="text-sm">
-          <a
-            href="{% url 'auth:forgot-password' %}"
-            class="font-medium text-indigo-600 hover:text-indigo-500"
-            >Forgot your password?</a
-          >
-        </div>
-        {% endcomment %}
       </div>
 
       <div>

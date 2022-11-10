@@ -930,6 +930,14 @@ select {
   height: 6rem;
 }
 
+.h-20 {
+  height: 5rem;
+}
+
+.h-14 {
+  height: 3.5rem;
+}
+
 .min-h-full {
   min-height: 100%;
 }
