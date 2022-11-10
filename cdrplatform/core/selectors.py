@@ -93,7 +93,7 @@ def removal_partner_get_from_method_slug(
 
 
 def removal_partner_list() -> Iterable[RemovalPartner]:
-    return RemovalPartner.objects.all()
+    return RemovalPartner.objects.filter(disabled=False)
 
 
 def currency_conversion_rate_get_latest(
