@@ -113,7 +113,7 @@ def cdr_weight_get_in_grams(*, cdr_amount: int, weight_unit: WeightUnitChoices) 
     if weight_unit == "t":
         cdr_amount_g = cdr_amount * 1000 * 1000
     elif weight_unit == "kg":
-        cdr_amount_g = cdr_amount_g * 1000
+        cdr_amount_g = cdr_amount * 1000
     else:
         cdr_amount_g = cdr_amount
 
