@@ -68,7 +68,10 @@ THIRD_PARTY_APPS = (
 if DEBUG:
     THIRD_PARTY_APPS = THIRD_PARTY_APPS + ("debug_toolbar",)
 
-CUSTOM_APPS = ("cdrplatform.core",)
+CUSTOM_APPS = (
+    "cdrplatform.theme",
+    "cdrplatform.core",
+)
 
 INSTALLED_APPS = BASE_APPS + THIRD_PARTY_APPS + CUSTOM_APPS
 

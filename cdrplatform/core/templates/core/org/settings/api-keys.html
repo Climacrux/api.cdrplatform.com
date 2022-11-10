@@ -1,49 +1,57 @@
 {% extends 'core/org/settings/base.html' %}
 
-{% block body %}
+{% block settings_title %}API keys{% endblock settings_title %}
 
-{% include 'core/org/settings/layout/navigation.html' %}
-
-<h1>api-keys</h1>
+{% block content %}
 
 {% if key %}
-    <h2>Your API Key:</h2>
-
-    <code>{{key}}</code>
-
-    <p>
-        <strong>Note:</strong> Your API key will only be visible now, this one time. Please take a note of it now
-    </p>
+  <div class="my-4">
+    {% include 'core/org/settings/layout/api-key-created-notification.html' with key=key %}
+  </div>
 {% endif %}
-
-<p></p>
 
 {% if form %}
-<form action="" method="post">
-  {% csrf_token %} {{ form }}
-
-  <input type="submit" value="Create Key" />
-</form>
+  <div class="mt-8 px-4 sm:px-6 lg:px-8">
+    {% include 'core/org/settings/layout/api-key-add-form.html' with form=form %}
+  </div>
 {% endif %}
 
-<h2>Production API keys</h2>
+<section id="api-keys-prod" class="my-8">
+  <div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center">
+      <div class="sm:flex-auto">
+        <h1 class="text-xl font-semibold text-gray-900">Production API Keys</h1>
+        <p class="mt-2 text-sm text-gray-700">
+          Production keys must be kept <strong> private and secure</strong>. Using these keys can
+          result in charges to your organisation.
+        </p>
+      </div>
+    </div>
 
-<ul>
-  {% for key in api_keys_prod %}
-  <li>Name: {{key.name}} | Key prefix: <code>{{ key.prefix }}</code></li>
-  {% empty %}
-  <li>No production API keys</li>
-  {% endfor %}
-</ul>
+    {% include 'core/org/settings/layout/api-key-table.html' with api_keys=api_keys_prod %}
+  </div>
+</section>
 
-<h2>Test API keys</h2>
+<section id="api-keys-test" class="my-8">
+  <div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center">
+      <div class="sm:flex-auto">
+        <h1 class="text-xl font-semibold text-gray-900">Test API Keys</h1>
+        <p class="mt-2 text-sm text-gray-700">
+          Test keys can be used during development and any usage will not be
+          present on any invoices.
+        </p>
+      </div>
+    </div>
 
-<ul>
-  {% for key in api_keys_test %}
-  <li>Name: {{key.name}} | Key prefix: <code>{{ key.prefix }}</code></li>
-  {% empty %}
-  <li>No test API keys</li>
-  {% endfor %}
-</ul>
+    {% with api_keys=api_keys_test %}
+      {% if api_keys|length > 0 %}
+        {% include 'core/org/settings/layout/api-key-table.html' %}
+      {% else %}
+        {% include 'core/org/settings/layout/no-api-keys.html' %}
+      {% endif %}
+    {% endwith %}
+  </div>
+</section>
 
-{% endblock body %}
+{% endblock content %}

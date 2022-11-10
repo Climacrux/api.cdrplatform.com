@@ -1,23 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}CDR Platform{% endblock title %}</title>
-  </head>
-  <body>
-    <div>
-      {% if messages %}
-      <ul class="messages">
-        {% for message in messages %}
-        <li class="message {% if message.tags %} {{ message.tags }}{% endif %}">
-          {{ message }}
-        </li>
-        {% endfor %}
-      </ul>
-      {% endif %}
-      <div>{% block content %}{% endblock content %}</div>
-    </div>
-  </body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}CDR Platform{% endblock title %}
+
+{% block body %}
+
+<div class="h-screen bg-gray-50">
+
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+      <li class="message {% if message.tags %} {{ message.tags }}{% endif %}">
+        {{ message }}
+      </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+
+  <div class="flex h-screen justify-center items-center">
+    {% block content %}{% endblock content %}
+  </div>
+
+</div>
+
+
+{% endblock body %}
