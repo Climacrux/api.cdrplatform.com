@@ -24,18 +24,26 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
+from cdrplatform.core.forms.auth.login import LoginForm
 from cdrplatform.core.views.auth.registration import UserRegisterView
 
 auth_patterns = (
     path(
         "login/",
-        auth_views.LoginView.as_view(redirect_authenticated_user=True),
+        auth_views.LoginView.as_view(
+            redirect_authenticated_user=True, form_class=LoginForm
+        ),
         name="login",
     ),
     path(
         "register/",
         UserRegisterView.as_view(redirect_authenticated_user=True),
         name="register",
+    ),
+    path(
+        "logout/",
+        auth_views.LogoutView.as_view(),
+        name="logout",
     ),
 )
 

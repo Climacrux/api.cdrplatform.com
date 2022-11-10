@@ -7,22 +7,25 @@
 <h1>api-keys</h1>
 
 {% if key %}
-    <h2>Your API Key:</h2>
+<h2>Your API Key:</h2>
 
-    <code>{{key}}</code>
+<code>{{key}}</code>
 
-    <p>
-        <strong>Note:</strong> Your API key will only be visible now, this one time. Please take a note of it now
-    </p>
+<p>
+  <strong>Note:</strong> Your API key will only be visible now, this one time.
+  Please take a note of it now
+</p>
 {% endif %}
 
 <p></p>
 
 {% if form %}
 <form action="" method="post">
-  {% csrf_token %} {{ form }}
+  {% csrf_token %}
 
-  <input type="submit" value="Create Key" />
+  {{ form }}
+
+  {% include 'components/forms/submit.html' with btnValue="Create Key" %}
 </form>
 {% endif %}
 
@@ -31,7 +34,9 @@
 <ul>
   {% for key in api_keys_prod %}
   <li>Name: {{key.name}} | Key prefix: <code>{{ key.prefix }}</code></li>
+
   {% empty %}
+
   <li>No production API keys</li>
   {% endfor %}
 </ul>

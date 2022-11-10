@@ -26,8 +26,14 @@
   "[python]": {
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-        "source.organizeImports": true
-    },
+      "source.organizeImports": true
+    }
   },
-  "python.formatting.blackPath": "black"
+  "python.formatting.blackPath": "black",
+  "files.associations": {
+    "**/*.html": "html",
+    "**/templates/**/*.html": "django-html",
+    "**/templates/*": "django-txt",
+    "**/requirements{/**,*}.{txt,in}": "pip-requirements"
+ },
 }

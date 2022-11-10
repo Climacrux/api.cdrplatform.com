@@ -52,6 +52,10 @@ $ # Example: Load the `removal_methods` data
 $ poetry run ./manage.py loaddata removal_methods_partners
 ```
 
+## UI, design and theme
+
+_See the [`cdrplatform/theme/README.md`](cdrplatform/theme/README.md)_
+
 ## Deployment
 
 _Todo_
