@@ -11,11 +11,9 @@
 {% endif %}
 
 {% if form %}
-  <form action="{% url 'org:settings:api_keys' %}" method="post">
-    {% csrf_token %}
-    {{ form }}
-    {% include 'components/forms/submit.html' with btnValue="Create Key" %}
-  </form>
+  <div class="mt-8 px-4 sm:px-6 lg:px-8">
+    {% include 'core/org/settings/layout/api-key-add-form.html' with form=form %}
+  </div>
 {% endif %}
 
 <section id="api-keys-prod" class="my-8">
