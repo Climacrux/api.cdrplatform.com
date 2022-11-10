@@ -1,0 +1,19 @@
+{
+  "name": "cdrplatform",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm run tailwind:build",
+    "dev": "npm run tailwind:watch",
+    "tailwind:build": "tailwindcss -i ./src/css/tailwind.css -o ./static/theme/css/tailwind.css",
+    "tailwind:watch": "npm run tailwind:build -- --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tailwindcss": "^3.2.3"
+  }
+}
