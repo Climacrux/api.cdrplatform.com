@@ -158,7 +158,8 @@ PASSWORD_HASHERS = ["cdrplatform.core.hashers.CDRPlatformArgon2PasswordHasher"]
 AUTH_USER_MODEL = "core.CDRUser"
 
 # Todo: replace or remove this when more complex routes are available
-LOGIN_REDIRECT_URL = "/org/settings/api-keys/"
+LOGIN_REDIRECT_URL = "org:settings:api_keys"
+LOGOUT_REDIRECT_URL = "auth:login"
 
 
 # Internationalization
