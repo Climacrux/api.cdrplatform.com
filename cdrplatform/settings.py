@@ -125,9 +125,11 @@ WSGI_APPLICATION = "cdrplatform.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+# https://django-environ.readthedocs.io/en/latest/types.html#environ-env-db-url
 DATABASES = {"default": env.db_url("DEFAULT_DB_URL")}
 
-CACHES = {"default": env.cache_url("DEFAULT_CACHE_URL")}
+# https://django-environ.readthedocs.io/en/latest/types.html#environ-env-cache-url
+CACHES = {"default": env.cache_url("DEFAULT_CACHE_URL", default="locmemcache://")}
 
 
 # Password validation
@@ -195,6 +197,10 @@ WHITENOISE_KEEP_ONLY_HASHED_FILES = True
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Security settings
+SECURE_SSL_REDIRECT = True  # should be caught by caddy
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 # Email Settings
 DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL")
