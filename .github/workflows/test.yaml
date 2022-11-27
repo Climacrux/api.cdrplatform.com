@@ -25,6 +25,9 @@ jobs:
           cache: 'poetry'
           architecture: 'x64'
 
+      - name: Check poetry setup
+        run: poetry run poetry check
+
       - name: Install dependencies
         run: poetry install
 
@@ -50,17 +53,11 @@ jobs:
       - name: Check django migrations would work
         run: poetry run ./manage.py makemigrations --dry-run --check
 
-      - name: Check django migrations are backwards compatible
-        run: poetry run ./manage.py lintmigrations --warnings-as-errors
-
-      - name: Check poetry setup
-        run: poetry run poetry check
-
       - name: Checking dependencies are secure and without any known vulnerabilities
         run: poetry run safety check --full-report
 
       - name: Check gunicorn production settings
-        run: gunicorn --check-config --config python:docker.django.gunicorn_config server.wsgi
+        run: poetry run gunicorn --check-config --config python:docker.django.gunicorn_config server.wsgi
 
       - name: Run tests
         run: poetry run ./manage.py test
