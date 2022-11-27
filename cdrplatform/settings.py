@@ -202,6 +202,13 @@ SECURE_SSL_REDIRECT = True  # should be caught by caddy
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
+# HSTS settings
+SECURE_HSTS_SECONDS = env.int("SECURE_HSTS_SECONDS", default=60 * 60)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool(
+    "SECURE_HSTS_INCLUDE_SUBDOMAINS", default=True
+)
+SECURE_HSTS_PRELOAD = env.bool("SECURE_HSTS_PRELOAD", default=True)
+
 # Email Settings
 DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL")
 SERVER_EMAIL = env.str("SERVER_EMAIL")
