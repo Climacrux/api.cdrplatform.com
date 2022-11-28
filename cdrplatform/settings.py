@@ -198,7 +198,7 @@ WHITENOISE_KEEP_ONLY_HASHED_FILES = True
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Security settings
-SECURE_SSL_REDIRECT = True  # should be caught by caddy
+SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", True)  # should be caught by caddy
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 

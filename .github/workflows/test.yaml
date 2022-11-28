@@ -56,5 +56,8 @@ jobs:
       - name: Checking dependencies are secure and without any known vulnerabilities
         run: poetry run safety check --full-report
 
+      - name: Use the dev env vars for testing
+        run: unlink .env && ln -s .env.dev .env
+
       - name: Run tests
         run: poetry run ./manage.py test
