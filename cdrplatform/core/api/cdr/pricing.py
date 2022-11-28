@@ -81,22 +81,22 @@ class CDRPricingView(BaseAPIView, UnauthenticatedMixin, APIKeyRequiredMixin):
 fees for a future CO₂ removal purchase.""",
     )
     def post(self, request):
-        input = self.InputSerializer(data=request.data)
+        input_data = self.InputSerializer(data=request.data)
         # We raise an exception if the data is invalid because it will be automatically
         # caught and handled by drf-standardized-errors.
         # This means it will have the same error format as every other error 👍
-        if input.is_valid(raise_exception=True):
+        if input_data.is_valid(raise_exception=True):
 
             def calculate_cost(element):
                 element["cost"] = removal_method_calculate_removal_cost(
                     removal_method_slug=element["method_type"],
-                    currency=input.validated_data.get("currency"),
+                    currency=input_data.validated_data.get("currency"),
                     cdr_amount=element["cdr_amount"],
-                    weight_unit=input.validated_data["weight_unit"],
+                    weight_unit=input_data.validated_data["weight_unit"],
                 )
                 return element
 
-            items = list(map(calculate_cost, input.validated_data.get("items")))
+            items = list(map(calculate_cost, input_data.validated_data.get("items")))
             removal_cost = functools.reduce(lambda x, y: x + y["cost"], items, 0)
             variable_fee = variable_fees_calculate(removal_cost=removal_cost)
 
@@ -108,8 +108,8 @@ fees for a future CO₂ removal purchase.""",
                         "variable_fees": variable_fee,
                         "total": removal_cost + variable_fee,
                     },
-                    "currency": input.validated_data.get("currency"),
-                    "weight_unit": input.validated_data.get("weight_unit"),
+                    "currency": input_data.validated_data.get("currency"),
+                    "weight_unit": input_data.validated_data.get("weight_unit"),
                 }
             )
             return Response(output.data, status=status.HTTP_201_CREATED)

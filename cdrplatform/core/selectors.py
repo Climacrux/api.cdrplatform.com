@@ -57,8 +57,8 @@ def api_key_list_prod_only(
 def api_key_get_from_key(*, key: str) -> OrganisationAPIKey:
     try:
         return OrganisationAPIKey.objects.get_from_key(key=key)
-    except OrganisationAPIKey.DoesNotExist:
-        raise  # be explicit
+    except OrganisationAPIKey.DoesNotExist as err:
+        raise err  # be explicit
 
 
 def api_key_must_be_present_and_valid(
@@ -88,8 +88,8 @@ def removal_partner_get_from_method_slug(
 ) -> RemovalPartner:
     try:
         return RemovalPartner.objects.get(removal_method__slug=method_slug)
-    except RemovalPartner.DoesNotExist:
-        raise  # be explicit
+    except RemovalPartner.DoesNotExist as err:
+        raise err  # be explicit
 
 
 def removal_partner_list() -> Iterable[RemovalPartner]:

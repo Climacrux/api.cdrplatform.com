@@ -85,17 +85,17 @@ removal certificate
         key = request.META["HTTP_AUTHORIZATION"].split()[1]
         api_key = api_key_must_be_present_and_valid(key=key)
 
-        input = self.InputSerializer(data=request.data)
+        input_data = self.InputSerializer(data=request.data)
         # We raise an exception if the data is invalid because it will be automatically
         # caught and handled by drf-standardized-errors.
         # This means it will have the same error format as every other error 👍
-        if input.is_valid(raise_exception=True):
+        if input_data.is_valid(raise_exception=True):
 
             removal_request = removal_request_create(
-                weight_unit=input.validated_data.get("weight_unit"),
-                currency=input.validated_data.get("currency"),
+                weight_unit=input_data.validated_data.get("weight_unit"),
+                currency=input_data.validated_data.get("currency"),
                 org_id=api_key.organisation_id,
-                request_items=input.validated_data.get("items"),
+                request_items=input_data.validated_data.get("items"),
             )
 
             output = self.OutputSerializer({"transaction_uuid": removal_request.uuid})

@@ -162,4 +162,3 @@ def api_key_revoke(
     _ = OrganisationAPIKey.objects.filter(prefix=key_prefix, organisation=org).update(
         expiry_date=timezone.now()
     )
-    return
