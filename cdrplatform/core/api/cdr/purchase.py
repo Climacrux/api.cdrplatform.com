@@ -5,6 +5,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_serializer
 from rest_framework import serializers, status
 from rest_framework.response import Response
 
+from cdrplatform.api_key_utils import extract_key_from_header
 from cdrplatform.core.api.base import BaseAPIView
 from cdrplatform.core.auth import APIKeyRequiredMixin, UnauthenticatedMixin
 from cdrplatform.core.models import CurrencyChoices, WeightUnitChoices
@@ -82,8 +83,9 @@ removal certificate
 **Note:** This will not return any prices, only a transaction UUID""",
     )
     def post(self, request):
-        key = request.META["HTTP_AUTHORIZATION"].split()[1]
-        api_key = api_key_must_be_present_and_valid(key=key)
+        api_key = api_key_must_be_present_and_valid(
+            key=extract_key_from_header(request=request)
+        )
 
         input_data = self.InputSerializer(data=request.data)
         # We raise an exception if the data is invalid because it will be automatically
@@ -92,6 +94,7 @@ removal certificate
         if input_data.is_valid(raise_exception=True):
 
             removal_request = removal_request_create(
+                is_test=api_key.is_test_key(),
                 weight_unit=input_data.validated_data.get("weight_unit"),
                 currency=input_data.validated_data.get("currency"),
                 org_id=api_key.organisation_id,

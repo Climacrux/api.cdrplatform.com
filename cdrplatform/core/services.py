@@ -42,12 +42,14 @@ def user_signup_with_default_customer_organisation(
 
 def removal_request_create(
     *,
+    is_test: bool,
     weight_unit: WeightUnitChoices,
     currency: CurrencyChoices,
     org_id: int,
     request_items: List[Dict[str, str | int]],
 ) -> RemovalRequest:
     removal_request = RemovalRequest.objects.create(
+        is_test=is_test,
         weight_unit=weight_unit,
         requested_datetime=timezone.now(),
         currency=currency,

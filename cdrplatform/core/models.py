@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework_api_key.models import AbstractAPIKey
 from shortuuid.django_fields import ShortUUIDField
 
+from cdrplatform.api_key_utils import is_prod_api_key, is_test_api_key
 from cdrplatform.core.managers import (
     CDRUserManager,
     ProdAPIKeyManager,
@@ -213,6 +214,8 @@ class RemovalMethod(models.Model):
 
 
 class RemovalRequest(models.Model):
+    # Whether this was a test request or not
+    is_test = models.BooleanField(default=True)
     weight_unit = models.CharField(
         choices=WeightUnitChoices.choices,
         max_length=2,
@@ -349,3 +352,11 @@ class OrganisationAPIKey(AbstractAPIKey):
     # Used for interacting with Test API keys
     # e.g. OrganisationAPIKey.test_objects.create_key()
     test_objects = TestAPIKeyManager()
+
+    def is_test_key(self):
+        "Helper function if key is test or not"
+        return is_test_api_key(prefix=self.prefix)
+
+    def is_prod_key(self):
+        "Helper function if key is prod or not"
+        return is_prod_api_key(prefix=self.prefix)

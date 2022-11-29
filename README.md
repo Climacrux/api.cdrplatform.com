@@ -63,8 +63,10 @@ _Todo_
 ### Application monitoring
 
 We use new relic. When running on production ensure to run with following commands:
+
+```shell
 $ NEW_RELIC_CONFIG_FILE=newrelic.ini newrelic-admin run-program
-$ $YOUR_COMMAND_OPTION
+```
 
 ## Contact
 

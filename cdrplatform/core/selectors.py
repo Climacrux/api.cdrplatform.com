@@ -72,6 +72,8 @@ def api_key_must_be_present_and_valid(
     - Key revoked: :class:`APIKeyNotPresentOrRevoked`
     - Key expired: :class:`APIKeyExpiredException`
     """
+    if key is None or key == "":
+        raise APIKeyNotPresentOrRevoked
     try:
         api_key = api_key_get_from_key(key=key)
     except OrganisationAPIKey.DoesNotExist:
