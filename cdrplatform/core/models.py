@@ -239,6 +239,11 @@ class RemovalRequest(models.Model):
         default=uuid.uuid4,
         editable=False,
     )
+    # If the removal request was made using a `test_` API key
+    is_test = models.BooleanField(
+        default=True,
+        editable=False,
+    )
 
     # ##################
     # Optional metadata fields that can be provided
