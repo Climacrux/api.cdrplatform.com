@@ -92,7 +92,6 @@ removal certificate
         # caught and handled by drf-standardized-errors.
         # This means it will have the same error format as every other error 👍
         if input_data.is_valid(raise_exception=True):
-
             removal_request = removal_request_create(
                 is_test=api_key.is_test_key(),
                 weight_unit=input_data.validated_data.get("weight_unit"),

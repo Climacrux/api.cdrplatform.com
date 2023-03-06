@@ -153,7 +153,6 @@ class APIKeyTestCase(APIKeyMixin, APITestCase):
 
 
 class CDRPricingViewTestCase(APIKeyMixin, APITestCase):
-
     fixtures = ("removal_methods_partners", "currency_conversion_rates")
 
     @classmethod
@@ -298,7 +297,6 @@ class CDRPricingViewTestCase(APIKeyMixin, APITestCase):
 
 
 class CDRRemovalViewTestCase(APIKeyMixin, APITestCase):
-
     fixtures = ("removal_methods_partners", "currency_conversion_rates")
 
     @classmethod

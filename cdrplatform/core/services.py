@@ -33,7 +33,6 @@ def user_signup_with_default_customer_organisation(
     email: str,
     password: str,
 ):
-
     new_user = CDRUser.objects.create_user(name=name, email=email, password=password)
     new_user.organisations.create(organisation_name="Default")
 
@@ -78,7 +77,6 @@ def removal_request_item_create(
     removal_request: RemovalRequest,
     cdr_amount: int,
 ) -> RemovalRequestItem:
-
     removal_cost = removal_method_calculate_removal_cost(
         removal_partner=removal_partner,
         currency=removal_request.currency,

@@ -35,7 +35,6 @@ class UserRegisterView(auth_views.RedirectURLMixin, FormView):
         return reverse("org:settings:api_keys")
 
     def form_valid(self, form) -> HttpResponse:
-
         try:
             user = user_signup_with_default_customer_organisation(
                 name=form.cleaned_data.get("name"),

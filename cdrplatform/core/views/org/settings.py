@@ -13,7 +13,6 @@ from cdrplatform.core.services import api_key_create_from_session
 
 
 class APIKeysView(LoginRequiredMixin, FormView):
-
     template_name = "core/org/settings/api-keys.html"
     form_class = NewAPIKeyForm
 

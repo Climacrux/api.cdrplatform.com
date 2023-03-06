@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 
 
 class UserRegistrationForm(forms.Form):
-
     error_css_class = "border-red-700"
 
     input_classes = """relative block w-full appearance-none
