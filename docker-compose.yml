@@ -1,0 +1,38 @@
+version: "3"
+services:
+  # Use PostgreSQL as the database
+  db:
+    image: postgres:15
+    networks:
+      - database
+    volumes:
+      - api_cdrplatform_com_db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: cdrplatform
+      POSTGRES_PASSWORD: cdrplatform
+      POSTGRES_DB: cdrplatform
+    ports:
+      - "5432:5432"
+
+  # Use Redis as the cache layer
+  cache:
+    image: redis:7
+    networks:
+      - cache
+    command:
+      # enable persistant storage
+      - redis-server
+      - --save 60 1
+      - --loglevel warning
+    volumes:
+      - api_cdrplatform_com_cache:/data
+    ports:
+      - "6379:6379"
+
+volumes:
+  api_cdrplatform_com_cache:
+  api_cdrplatform_com_db:
+
+networks:
+  database:
+  cache:

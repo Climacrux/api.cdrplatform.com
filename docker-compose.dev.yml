@@ -1,0 +1,14 @@
+# This docker-compose expands on docker-compose.yml.
+# It can be used like the following:
+#   docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+# 
+
+services:
+  # Development container for VS Code Remote - Containers
+  # https://code.visualstudio.com/docs/remote/containers
+  # The devcontainer.json file in the .devcontainer folder is used to configure the container.
+  devcontainer:
+    image: mcr.microsoft.com/devcontainers/python:0-3.11
+    volumes:
+      - .:/workspace:cached
+    # command: sleep infinity
