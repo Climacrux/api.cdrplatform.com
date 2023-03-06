@@ -14,7 +14,7 @@ authors = ["Ewan Jones <ewan@climacrux.com>"]
 license = "Proprietry"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 Django = { extras = ["argon2"], version = "^4.1.1" }
 django-environ = "^0.10.0"
 django-allauth = "^0.51.0"
