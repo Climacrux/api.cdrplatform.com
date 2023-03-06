@@ -1,0 +1,5 @@
+FROM mcr.microsoft.com/devcontainers/python:0-3.11
+
+RUN sudo apt update && \
+    # GPG2 installed for Git signing
+    sudo apt install gnupg2 -y

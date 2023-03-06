@@ -9,10 +9,8 @@ services:
       - api_cdrplatform_com_db:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: cdrplatform
-      POSTGRES_PASSWORD: cdrplatform
+      POSTGRES_PASSWORD: cdrplatformpassword
       POSTGRES_DB: cdrplatform
-    ports:
-      - "5432:5432"
 
   # Use Redis as the cache layer
   cache:
@@ -26,8 +24,22 @@ services:
       - --loglevel warning
     volumes:
       - api_cdrplatform_com_cache:/data
-    ports:
-      - "6379:6379"
+
+  # Development container for VS Code Remote - Containers
+  # https://code.visualstudio.com/docs/remote/containers
+  # The devcontainer.json file in the .devcontainer folder is used to configure the container.
+  devcontainer:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    networks:
+      - database
+      - cache
+    volumes:
+      - .:/workspaces/api.cdrplatform.com:cached
+    # command: sleep infinity
+    env_file:
+      - .env
 
 volumes:
   api_cdrplatform_com_cache:
