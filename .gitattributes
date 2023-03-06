@@ -1,0 +1,5 @@
+# Make sure everything is LF
+* text=auto eol=lf
+# except Windows CMD & BAT files which need CRLF
+*.{cmd,[cC][mM][dD]} text eol=crlf
+*.{bat,[bB][aA][tT]} text eol=crlf
