@@ -51,7 +51,7 @@ jobs:
           DJANGO_COLLECTSTATIC_DRYRUN: 1
 
       - name: Check django migrations would work
-        run: poetry run ./manage.py makemigrations --dry-run --check
+        run: poetry run ./manage.py makemigrations --dry-run --check --verbosity 3
 
       - name: Checking dependencies are secure and without any known vulnerabilities
         run: poetry run safety check --full-report
