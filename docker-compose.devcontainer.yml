@@ -1,0 +1,21 @@
+version: "3"
+services:
+  # Development container for VS Code Remote - Containers
+  # https://code.visualstudio.com/docs/remote/containers
+  # The devcontainer.json file in the .devcontainer folder is used to configure the container.
+  devcontainer:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    networks:
+      - database
+      - cache
+    volumes:
+      - .:/workspaces/api.cdrplatform.com:cached
+      - apicdrplatformcom_cache:/home/vscode/.cache
+    # command: sleep infinity
+    env_file:
+      - .env
+
+volumes:
+  apicdrplatformcom_cache:

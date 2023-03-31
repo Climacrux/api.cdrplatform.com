@@ -25,22 +25,6 @@ services:
     volumes:
       - api_cdrplatform_com_cache:/data
 
-  # Development container for VS Code Remote - Containers
-  # https://code.visualstudio.com/docs/remote/containers
-  # The devcontainer.json file in the .devcontainer folder is used to configure the container.
-  devcontainer:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    networks:
-      - database
-      - cache
-    volumes:
-      - .:/workspaces/api.cdrplatform.com:cached
-    # command: sleep infinity
-    env_file:
-      - .env
-
 volumes:
   api_cdrplatform_com_cache:
   api_cdrplatform_com_db:

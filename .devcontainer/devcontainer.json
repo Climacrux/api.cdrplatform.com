@@ -4,32 +4,47 @@
 	"name": "api.cdrplatform.com",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	// "image": "mcr.microsoft.com/devcontainers/python:0-3.11",
-	"dockerComposeFile": "../docker-compose.yml",
+	"dockerComposeFile": [
+		"../docker-compose.yml",
+		"../docker-compose.devcontainer.yml"
+	],
 	"service": "devcontainer",
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"shutdownAction": "stopCompose",
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
 		"ghcr.io/devcontainers-contrib/features/poetry:2": {},
 		"ghcr.io/devcontainers/features/common-utils:2": {
 			"configureZshAsDefaultShell": true
 		},
-		"ghcr.io/devcontainers-contrib/features/pre-commit:2": {}
+		"ghcr.io/devcontainers-contrib/features/pre-commit:2": {},
+		"ghcr.io/jungaretti/features/ripgrep:1": {}
 	},
 	"overrideCommand": true,
-	// Persist user data etc.
-	// https://code.visualstudio.com/docs/devcontainers/tips-and-tricks#_persisting-user-profile
-	"mounts": [
-		"source=api.cdrplatform-profile,target=/root,type=volume",
-		"target=/root/.vscode-server,type=volume"
-	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
 		8000
 	],
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "poetry install && poetry run ./manage.py migrate"
+	"postCreateCommand": "sudo chown vscode /home/vscode/.cache && poetry install && poetry run ./manage.py migrate",
+	"postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
 	// Configure tool-specific properties.
-	// "customizations": {},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"github.copilot",
+				"bradlc.vscode-tailwindcss",
+				"editorconfig.editorconfig",
+				"streetsidesoftware.code-spell-checker",
+				"sibiraj-s.vscode-scss-formatter",
+				"pkief.material-icon-theme",
+				"eamodio.gitlens",
+				"yzhang.markdown-all-in-one",
+				"toba.vsfire",
+				"usernamehw.errorlens"
+			]
+		}
+	}
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
 }
