@@ -241,6 +241,12 @@ SPECTACULAR_SETTINGS = {
 
 Fetch prices and order carbon dioxide removal from a portfolio of suppliers.""",  # noqa: W293, E501
     "VERSION": "0.1.0",
+    "SERVERS": [
+        {
+            "url": "https://api.cdrplatform.com/",
+            "description": "Production server (uses live data)",
+        },
+    ],
     "SERVE_INCLUDE_SCHEMA": False,
     "CONTACT": {
         "name": "CDR Support",
