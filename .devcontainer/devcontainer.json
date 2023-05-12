@@ -26,7 +26,7 @@
 		8000
 	],
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "sudo chown vscode /home/vscode/.cache && poetry install && poetry run ./manage.py migrate",
+	"postCreateCommand": "sudo chown vscode /home/vscode/.cache && poetry install",
 	"postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
 	// Configure tool-specific properties.
 	"customizations": {
@@ -35,6 +35,8 @@
 				"github.copilot",
 				"bradlc.vscode-tailwindcss",
 				"editorconfig.editorconfig",
+				"ms-azuretools.vscode-docker",
+				"tamasfe.even-better-toml",
 				"streetsidesoftware.code-spell-checker",
 				"sibiraj-s.vscode-scss-formatter",
 				"pkief.material-icon-theme",
