@@ -269,7 +269,7 @@ Fetch prices and order carbon dioxide removal from a portfolio of suppliers.""",
     "AUTHENTICATION_WHITELIST": ("cdrplatform.core.permissions.HasOrganisationAPIKey",),
     "APPEND_COMPONENTS": {
         "securitySchemes": {
-            "Organisation API Key": {
+            "organisation-api-key": {
                 "type": "apiKey",
                 "in": "header",
                 "name": "Authorization",
@@ -294,7 +294,7 @@ docs](https://docs.cdrplatform.com/)._
     },
     "SECURITY": [
         {
-            "Organisation API Key": [],
+            "organisation-api-key": [],
         }
     ],
 }
