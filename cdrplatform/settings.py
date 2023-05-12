@@ -15,7 +15,7 @@ from pathlib import Path
 
 import environ
 
-env = environ.Env(DJANGO_DEBUG=(bool, False))
+env = environ.Env()
 # This will be disabled in future anyway so explicitly disable now to avoid any
 # future weirdness
 env.smart_cast = False
@@ -27,8 +27,7 @@ env.prefix = (
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load any .env files
-env.read_env(os.path.join(BASE_DIR, ".env"))
-
+env.read_env(os.path.join(BASE_DIR, ".env"), overwrite=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -199,7 +198,9 @@ WHITENOISE_KEEP_ONLY_HASHED_FILES = True
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Security settings
-SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", True)  # should be caught by caddy
+SECURE_SSL_REDIRECT = env.bool(
+    "SECURE_SSL_REDIRECT", default=True
+)  # should be caught by caddy
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
@@ -241,6 +242,12 @@ SPECTACULAR_SETTINGS = {
 
 Fetch prices and order carbon dioxide removal from a portfolio of suppliers.""",  # noqa: W293, E501
     "VERSION": "0.1.0",
+    "SERVERS": [
+        {
+            "url": "https://api.cdrplatform.com/",
+            "description": "Production server (uses live data)",
+        },
+    ],
     "SERVE_INCLUDE_SCHEMA": False,
     "CONTACT": {
         "name": "CDR Support",
@@ -269,7 +276,7 @@ Fetch prices and order carbon dioxide removal from a portfolio of suppliers.""",
     "AUTHENTICATION_WHITELIST": ("cdrplatform.core.permissions.HasOrganisationAPIKey",),
     "APPEND_COMPONENTS": {
         "securitySchemes": {
-            "Organisation API Key": {
+            "organisation-api-key": {
                 "type": "apiKey",
                 "in": "header",
                 "name": "Authorization",
@@ -294,7 +301,7 @@ docs](https://docs.cdrplatform.com/)._
     },
     "SECURITY": [
         {
-            "Organisation API Key": [],
+            "organisation-api-key": [],
         }
     ],
 }

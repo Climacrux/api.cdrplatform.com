@@ -14,8 +14,6 @@ services:
       - .:/workspaces/api.cdrplatform.com:cached
       - apicdrplatformcom_cache:/home/vscode/.cache
     # command: sleep infinity
-    env_file:
-      - .env
 
 volumes:
   apicdrplatformcom_cache:
