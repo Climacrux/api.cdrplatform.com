@@ -35,7 +35,7 @@ jobs:
         run: poetry run flake8 .
 
       - name: Set up the testing environment variables that are close to prod
-        run: ln -s .env.test .env
+        run: ln -s .env.dist .env
 
       # embed this into the CI itself but taken from:
       # https://raw.githubusercontent.com/wemake-services/wemake-django-template/master/%7B%7Bcookiecutter.project_name%7D%7D/docker/django/ci.sh
