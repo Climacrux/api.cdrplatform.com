@@ -15,7 +15,7 @@ from pathlib import Path
 
 import environ
 
-env = environ.Env(DJANGO_DEBUG=(bool, False))
+env = environ.Env()
 # This will be disabled in future anyway so explicitly disable now to avoid any
 # future weirdness
 env.smart_cast = False
@@ -27,8 +27,7 @@ env.prefix = (
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load any .env files
-env.read_env(os.path.join(BASE_DIR, ".env"))
-
+env.read_env(os.path.join(BASE_DIR, ".env"), overwrite=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -199,7 +198,9 @@ WHITENOISE_KEEP_ONLY_HASHED_FILES = True
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Security settings
-SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", True)  # should be caught by caddy
+SECURE_SSL_REDIRECT = env.bool(
+    "SECURE_SSL_REDIRECT", default=True
+)  # should be caught by caddy
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
