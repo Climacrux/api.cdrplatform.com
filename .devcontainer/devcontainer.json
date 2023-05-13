@@ -18,7 +18,8 @@
 			"configureZshAsDefaultShell": true
 		},
 		"ghcr.io/devcontainers-contrib/features/pre-commit:2": {},
-		"ghcr.io/jungaretti/features/ripgrep:1": {}
+		"ghcr.io/jungaretti/features/ripgrep:1": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {}
 	},
 	"overrideCommand": true,
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
