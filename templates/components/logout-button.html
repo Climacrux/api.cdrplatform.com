@@ -1,8 +1,6 @@
-<form
-  action="{% url 'auth:logout' %}"
-  method="POST"
-  class="font-medium text-indigo-600 hover:text-indigo-900 text-center"
->
-  {% csrf_token %}
-  <input type="submit" value="Logout" class="cursor-pointer" />
+<form action="{% url 'auth:logout' %}"
+      method="post"
+      class="font-medium text-indigo-600 hover:text-indigo-900 text-center">
+    {% csrf_token %}
+    <input type="submit" value="Logout" class="cursor-pointer" />
 </form>

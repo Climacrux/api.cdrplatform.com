@@ -1,27 +1,19 @@
-{% extends 'base.html' %}
-
-{% block title %}CDR Platform{% endblock title %}
-
+{% extends "base.html" %}
+{% block title %}
+    CDR Platform
+{% endblock title %}
 {% block body %}
-
-<div class="h-screen bg-gray-50">
-
-  {% if messages %}
-    <ul class="messages">
-      {% for message in messages %}
-      <li class="message {% if message.tags %} {{ message.tags }}{% endif %}">
-        {{ message }}
-      </li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-
-
-  <div class="flex h-screen justify-center items-center">
-    {% block content %}{% endblock content %}
-  </div>
-
-</div>
-
-
+    <div class="h-screen bg-gray-50">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="message {% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <div class="flex h-screen justify-center items-center">
+            {% block content %}
+            {% endblock content %}
+        </div>
+    </div>
 {% endblock body %}

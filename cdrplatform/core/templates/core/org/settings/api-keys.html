@@ -1,53 +1,42 @@
-{% extends 'core/org/settings/base.html' %}
-
-{% block settings_title %}API keys{% endblock settings_title %}
-
+{% extends "core/org/settings/base.html" %}
+{% block settings_title %}
+    API keys
+{% endblock settings_title %}
 {% block content %}
-
-{% if key %}
-  <div class="my-4">
-    {% include 'core/org/settings/layout/api-key-created-notification.html' with key=key %}
-  </div>
-{% endif %}
-
-{% if form %}
-  <div class="mt-8 ">
-    {% include 'core/org/settings/layout/api-key-add-form.html' with form=form %}
-  </div>
-{% endif %}
-
-<section id="api-keys-prod" class="my-8">
-  <div class="sm:flex sm:items-center">
-    <div class="sm:flex-auto">
-      <h1 class="text-xl font-semibold text-gray-900">Production API Keys</h1>
-      <p class="mt-2 text-sm text-gray-700">
-        Production keys must be kept <strong> private and secure</strong>. Using these keys can
-        result in charges to your organisation.
-      </p>
-    </div>
-  </div>
-
-  {% include 'core/org/settings/layout/api-key-table.html' with api_keys=api_keys_prod %}
-</section>
-
-<section id="api-keys-test" class="my-8">
-  <div class="sm:flex sm:items-center">
-    <div class="sm:flex-auto">
-      <h1 class="text-xl font-semibold text-gray-900">Test API Keys</h1>
-      <p class="mt-2 text-sm text-gray-700">
-        Test keys can be used during development and any usage will not be
-        present on any invoices.
-      </p>
-    </div>
-  </div>
-
-  {% with api_keys=api_keys_test %}
-    {% if api_keys|length > 0 %}
-      {% include 'core/org/settings/layout/api-key-table.html' %}
-    {% else %}
-      {% include 'core/org/settings/layout/no-api-keys.html' %}
+    {% if key %}
+        <div class="my-4">{% include "core/org/settings/layout/api-key-created-notification.html" with key=key %}</div>
     {% endif %}
-  {% endwith %}
-</section>
-
+    {% if form %}
+        <div class="mt-8 ">{% include "core/org/settings/layout/api-key-add-form.html" with form=form %}</div>
+    {% endif %}
+    <section id="api-keys-prod" class="my-8">
+        <div class="sm:flex sm:items-center">
+            <div class="sm:flex-auto">
+                <h1 class="text-xl font-semibold text-gray-900">Production API Keys</h1>
+                <p class="mt-2 text-sm text-gray-700">
+                    Production keys must be kept <strong>private and secure</strong>. Using these keys can
+                    result in charges to your organisation.
+                </p>
+            </div>
+        </div>
+        {% include "core/org/settings/layout/api-key-table.html" with api_keys=api_keys_prod %}
+    </section>
+    <section id="api-keys-test" class="my-8">
+        <div class="sm:flex sm:items-center">
+            <div class="sm:flex-auto">
+                <h1 class="text-xl font-semibold text-gray-900">Test API Keys</h1>
+                <p class="mt-2 text-sm text-gray-700">
+                    Test keys can be used during development and any usage will not be
+                    present on any invoices.
+                </p>
+            </div>
+        </div>
+        {% with api_keys=api_keys_test %}
+            {% if api_keys|length > 0 %}
+                {% include "core/org/settings/layout/api-key-table.html" %}
+            {% else %}
+                {% include "core/org/settings/layout/no-api-keys.html" %}
+            {% endif %}
+        {% endwith %}
+    </section>
 {% endblock content %}
