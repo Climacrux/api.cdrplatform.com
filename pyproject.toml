@@ -3,6 +3,10 @@ exclude_dirs = ["tests"]
 # tests = ["B201", "B301"]
 # skips = ["B101", "B601"]
 
+[tool.djlint]
+profile = "django"
+extension = "html"
+
 [tool.isort]
 profile = 'black'
 
@@ -43,6 +47,7 @@ Faker = "^15.1.1"
 flake8-django = "^1.1.5"
 pre-commit = "^2.20.0"
 safety = "^2.3.1"
+djlint = "^1.28.0"
 
 [tool.pylint.format]
 max-line-length = "88"

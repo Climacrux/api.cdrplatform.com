@@ -2,6 +2,11 @@ minimum_pre_commit_version: "2.20.0"
 # fail_fast: true
 exclude: '.*\/migrations\/.*\.py'
 repos:
+  - repo: https://github.com/Riverside-Healthcare/djLint
+    rev: v1.28.0
+    hooks:
+      - id: djlint-reformat-django
+      - id: djlint-django
   - repo: https://github.com/pycqa/isort
     rev: 5.12.0
     hooks:
