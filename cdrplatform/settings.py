@@ -306,6 +306,14 @@ docs](https://docs.cdrplatform.com/)._
     ],
 }
 
+if DEBUG:
+    SPECTACULAR_SETTINGS["SERVERS"].append(
+        {
+            "url": "http://localhost:8000/",
+            "description": "Local development server (uses test data)",
+        }
+    )
+
 
 # CDR Platform application settings
 # ---------------------------------------------------------------------------

@@ -18,6 +18,7 @@ from cdrplatform.core.exceptions import (
 )
 
 from .models import (
+    Certificate,
     CurrencyChoices,
     CurrencyConversionRate,
     CustomerOrganisation,
@@ -222,3 +223,11 @@ def customer_organisation_get_from_session(
         raise CustomerOrganizationNotFound
 
     return org
+
+
+def certificate_get_by_id(*, certificate_id: str) -> Certificate:
+    """Looks up a certificate by its public ID."""
+    try:
+        return Certificate.objects.get(certificate_id=certificate_id)
+    except Certificate.DoesNotExist as err:
+        raise err  # be explicit

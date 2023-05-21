@@ -290,6 +290,18 @@ class RemovalRequest(models.Model):
         )
         return q["cdr_cost__sum"] + q["variable_fees__sum"]
 
+    @property
+    def total_kg(self) -> int:
+        """Helper function to sum all the request items for the
+        total weight in kg."""
+        q = self.items.aggregate(models.Sum("cdr_amount"))
+        if self.weight_unit == WeightUnitChoices.GRAM:
+            return q["cdr_amount__sum"] * 1000
+        elif self.weight_unit == WeightUnitChoices.TONNE:
+            return q["cdr_amount__sum"] / 1000
+        else:
+            return q["cdr_amount__sum"]
+
 
 class RemovalRequestItem(models.Model):
     removal_partner = models.ForeignKey(
