@@ -6,6 +6,8 @@ exclude_dirs = ["tests"]
 [tool.djlint]
 profile = "django"
 extension = "html"
+# H031 = meta keywords. No longer really used so ignore them
+ignore = "H031"
 
 [tool.isort]
 profile = 'black'
