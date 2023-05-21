@@ -25,7 +25,7 @@
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   "forwardPorts": [8000],
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "sudo chown vscode /home/vscode/.cache && poetry install",
+  "postCreateCommand": "sudo chown vscode /home/vscode/.cache && poetry install && poetry run pre-commit install",
   "postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
   // Configure tool-specific properties.
   "customizations": {
