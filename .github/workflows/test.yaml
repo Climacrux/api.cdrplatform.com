@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install poetry
-        run: pipx install poetry
+        run: pipx install poetry==1.5.0
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -42,18 +42,18 @@ jobs:
       # embed this into the CI itself but taken from:
       # https://raw.githubusercontent.com/wemake-services/wemake-django-template/master/%7B%7Bcookiecutter.project_name%7D%7D/docker/django/ci.sh
       - name: Check django settings
-        run: poetry run ./manage.py check --deploy --fail-level WARNING
+        run: poetry run python ./manage.py check --deploy --fail-level WARNING
         env:
           DJANGO_ENV: production
 
       - name: Check django staticfiles app is working
-        run: poetry run ./manage.py collectstatic --no-input --dry-run
+        run: poetry run python ./manage.py collectstatic --no-input --dry-run
         env:
           DJANGO_ENV: production
           DJANGO_COLLECTSTATIC_DRYRUN: 1
 
       - name: Check django migrations would work
-        run: poetry run ./manage.py makemigrations --dry-run --check --verbosity 3
+        run: poetry run python ./manage.py makemigrations --dry-run --check --verbosity 3
 
       - name: Checking dependencies are secure and without any known vulnerabilities
         run: poetry run safety check --full-report
@@ -62,4 +62,4 @@ jobs:
         run: unlink .env && ln -s .env.test .env
 
       - name: Run tests
-        run: poetry run ./manage.py test
+        run: poetry run python ./manage.py test
