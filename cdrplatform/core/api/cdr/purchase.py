@@ -71,7 +71,8 @@ class CDRRemovalView(BaseAPIView, UnauthenticatedMixin, APIKeyRequiredMixin):
         responses={
             status.HTTP_201_CREATED: OutputSerializer,
         },
-        operation_id="CDRPurchase",
+        operation_id="cdr_purchase",
+        summary="Purchase CO₂ removal",
         description="""Submit a request to purchase carbon dioxide removal.
 
 By using this endpoint your organisation is committing to buy CO₂ from Climacrux LLC.

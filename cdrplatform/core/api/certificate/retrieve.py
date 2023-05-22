@@ -20,11 +20,13 @@ class CertificateRetrievalView(BaseAPIView, UnauthenticatedMixin, APIKeyRequired
         # todo: breakdown - somehow
 
     @extend_schema(
+        operation_id="certificate_retrieve_id",
         responses={
             status.HTTP_200_OK: OutputSerializer,
         },
-        operation_id="retrieve_certificate",
-        description="""Given a certificate ID, retrieve the certificate's details.""",
+        summary="Get CDR certificate by ID",
+        description="""Given a certificate ID, retrieve the certificate's details
+that can be used as proof of purchase.""",
     )
     def get(self, request, id: str):
         """Retrieve a certificate by its ID."""

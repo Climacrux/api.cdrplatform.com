@@ -71,12 +71,13 @@ class CDRPricingView(BaseAPIView, UnauthenticatedMixin, APIKeyRequiredMixin):
         )
 
     @extend_schema(
-        operation_id="CDRPrice",
+        operation_id="cdr_price",
         request=InputSerializer,
         responses={
             status.HTTP_201_CREATED: OutputSerializer,
         },
         tags=("CO₂ Removal",),
+        summary="Calculate CO₂ removal price",
         description="""Calculate the removal costs and
 fees for a future CO₂ removal purchase.""",
     )
