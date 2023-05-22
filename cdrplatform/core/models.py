@@ -214,8 +214,6 @@ class RemovalMethod(models.Model):
 
 
 class RemovalRequest(models.Model):
-    # Whether this was a test request or not
-    is_test = models.BooleanField(default=True)
     weight_unit = models.CharField(
         choices=WeightUnitChoices.choices,
         max_length=2,
@@ -291,16 +289,28 @@ class RemovalRequest(models.Model):
         return q["cdr_cost__sum"] + q["variable_fees__sum"]
 
     @property
+    def total_grams(self) -> int:
+        """Helper function to sum all the request items for the
+        total weight in grams."""
+        q = self.items.aggregate(models.Sum("cdr_amount"))
+        if self.weight_unit == WeightUnitChoices.KILOGRAM:
+            return q["cdr_amount__sum"] * 1000
+        elif self.weight_unit == WeightUnitChoices.TONNE:
+            return q["cdr_amount__sum"] * 1000 * 1000
+        else:
+            return q["cdr_amount__sum"]
+
+    @property
     def total_kg(self) -> int:
         """Helper function to sum all the request items for the
         total weight in kg."""
-        q = self.items.aggregate(models.Sum("cdr_amount"))
-        if self.weight_unit == WeightUnitChoices.GRAM:
-            return q["cdr_amount__sum"] * 1000
-        elif self.weight_unit == WeightUnitChoices.TONNE:
-            return q["cdr_amount__sum"] / 1000
-        else:
-            return q["cdr_amount__sum"]
+        return self.total_grams / 1000
+
+    @property
+    def total_tons(self) -> int:
+        """Helper function to sum all the request items for the
+        total weight in tons."""
+        return self.total_kg / 1000
 
 
 class RemovalRequestItem(models.Model):

@@ -1,7 +1,7 @@
 import uuid
 from datetime import timedelta
 
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
 from faker import Faker
 from rest_framework import status
@@ -368,6 +368,8 @@ class CDRRemovalViewTestCase(APIKeyMixin, APITestCase):
         self.assertEqual(removal_request.removal_cost, 11040)
         self.assertEqual(removal_request.variable_fees, 960)
         self.assertEqual(removal_request.total_cost, 12000)
+        # The request should have stored the correct cdr amount in kilograms
+        self.assertEqual(removal_request.total_kg, 10000)
 
     def test_disabled_partner(self):
         """
@@ -454,7 +456,73 @@ class CDRRemovalViewTestCase(APIKeyMixin, APITestCase):
         self.assertEqual(removal_request.variable_fees, 105308)
         self.assertEqual(removal_request.total_cost, 1316348)
 
+        # The request should have stored the correct cdr amount in kilograms
+        self.assertEqual(removal_request.total_kg, 20000)
+
         # Send another request and check we have the correct number of requests
         response = self.client.post(url, data)
         removal_requests = RemovalRequest.objects.filter(customer_organisation=self.org)
         self.assertEqual(removal_requests.count(), 2)
+
+
+class CertificateRetrievalViewTestCase(APIKeyMixin, APITestCase):
+    # @classmethod
+    # def setUpTestData(cls) -> None:
+    #     removal_request = RemovalRequest.objects.create(
+    #         is_test=True,
+    #         weight_unit=WeightUnitChoices.KILOGRAM,
+    #         currency=CurrencyChoices.CHF,
+    #         invoice=None,
+    #         customer_orgaisation=cls.org,
+    #     )
+    #     Certificate.objects.create(
+    #         certificate_id="XXX-YYY-ZZZ",
+    #         issued_date=datetime.date(2020, 1, 1),
+    #         display_name="Test Certificate",
+    #         removal_request=removal_request,
+    #     )
+    #     return super().setUpTestData()
+
+    def test_certificate_retrieval_exists(self):
+        """
+        Ensure we can successfully retrieve a certificate.
+        """
+        url = reverse("v1:certificate_retrieve", kwargs={"id": "XXX-YYY-ZZZ"})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.data,
+            {
+                "certificate_id": "XXX-YYY-ZZZ",
+                "issued_date": "2020-01-01",
+                "display_name": "Test Certificate",
+            },
+        )
+
+    def test_certificate_retrieval_for_non_existent_certificate(self):
+        """
+        Ensure we get a 404 when trying to retrieve a non-existent certificate.
+        """
+        url = reverse("v1:certificate_retrieve", kwargs={"id": "XXX-XXX-XXX"})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(
+            response.data,
+            {
+                "type": "client_error",
+                "errors": [
+                    {
+                        "code": "not_found",
+                        "detail": "Certificate not found",
+                        "attr": None,
+                    }
+                ],
+            },
+        )
+
+    def test_certificate_retrieval_url_lookup_with_invalid_id(self):
+        """
+        Ensure our certificate IDs are validated when reverse matching the URL.
+        """
+        with self.assertRaises(NoReverseMatch):
+            reverse("v1:certificate_retrieve", kwargs={"id": "123-XXX-XXX"})
