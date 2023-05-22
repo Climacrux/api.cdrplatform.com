@@ -61,13 +61,13 @@ $ # install the pre-commit hooks
 $ poetry run pre-commit install
 
 $ # run the database migrations
-$ poetry run ./manage.py migrate
+$ poetry run python ./manage.py migrate
 
 $ # start the development server
-$ poetry run ./manage.py runserver
+$ poetry run python ./manage.py runserver
 
 $ # Done when needing a superuser
-$ poetry run ./manage.py createsuperuser
+$ poetry run python ./manage.py createsuperuser
 ```
 
 ### Trying out requests to the API
@@ -84,7 +84,7 @@ We have some [fixtures](https://docs.djangoproject.com/en/4.1/howto/initial-data
 
 ```shell
 $ # Example: Load the `removal_methods` data
-$ poetry run ./manage.py loaddata removal_methods_partners
+$ poetry run python ./manage.py loaddata removal_methods_partners
 ```
 
 ## UI, design and theme
