@@ -1,3 +1,4 @@
+import datetime
 import uuid
 from datetime import timedelta
 
@@ -20,11 +21,14 @@ from cdrplatform.core.selectors import (
 from cdrplatform.core.services import api_key_create
 
 from .models import (
+    Certificate,
     CurrencyChoices,
     CurrencyConversionRate,
     CustomerOrganisation,
     OrganisationAPIKey,
     RemovalRequest,
+    RemovalRequestItem,
+    WeightUnitChoices,
 )
 
 fake = Faker()
@@ -466,27 +470,39 @@ class CDRRemovalViewTestCase(APIKeyMixin, APITestCase):
 
 
 class CertificateRetrievalViewTestCase(APIKeyMixin, APITestCase):
-    # @classmethod
-    # def setUpTestData(cls) -> None:
-    #     removal_request = RemovalRequest.objects.create(
-    #         is_test=True,
-    #         weight_unit=WeightUnitChoices.KILOGRAM,
-    #         currency=CurrencyChoices.CHF,
-    #         invoice=None,
-    #         customer_orgaisation=cls.org,
-    #     )
-    #     Certificate.objects.create(
-    #         certificate_id="XXX-YYY-ZZZ",
-    #         issued_date=datetime.date(2020, 1, 1),
-    #         display_name="Test Certificate",
-    #         removal_request=removal_request,
-    #     )
-    #     return super().setUpTestData()
+    validCertificateId = "XXX-YYY-ZZZ"
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        removal_request = RemovalRequest.objects.create(
+            weight_unit=WeightUnitChoices.KILOGRAM,
+            currency=CurrencyChoices.CHF,
+        )
+
+        RemovalRequestItem.objects.create(
+            removal_request=removal_request,
+            cdr_cost=1000,
+            variable_fees=150,
+            cdr_amount=500,
+        )
+
+        Certificate.objects.create(
+            certificate_id=cls.validCertificateId,
+            issued_date=datetime.date(2020, 1, 1),
+            display_name="Test Certificate",
+            removal_request=removal_request,
+        )
+        return super().setUpTestData()
 
     def test_certificate_retrieval_exists(self):
         """
         Ensure we can successfully retrieve a certificate.
         """
+
+        # Create a certificate in the database
+        removal_request = RemovalRequest.objects.filter(customer_organisation=self.org)
+        self.assertEqual(removal_request.count(), 0)
+
         url = reverse("v1:certificate_retrieve", kwargs={"id": "XXX-YYY-ZZZ"})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -496,6 +512,7 @@ class CertificateRetrievalViewTestCase(APIKeyMixin, APITestCase):
                 "certificate_id": "XXX-YYY-ZZZ",
                 "issued_date": "2020-01-01",
                 "display_name": "Test Certificate",
+                "removal_amount_kg": 500,
             },
         )
 

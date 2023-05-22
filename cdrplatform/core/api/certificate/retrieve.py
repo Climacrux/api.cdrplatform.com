@@ -1,7 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from drf_spectacular.utils import extend_schema, extend_schema_serializer
-from requests import Response
-from rest_framework import exceptions, serializers, status
+from rest_framework import exceptions, response, serializers, status
 
 from cdrplatform.core.api.base import BaseAPIView
 from cdrplatform.core.auth import APIKeyRequiredMixin, UnauthenticatedMixin
@@ -14,7 +13,7 @@ from cdrplatform.core.selectors import certificate_get_by_id
 class CertificateRetrievalView(BaseAPIView, UnauthenticatedMixin, APIKeyRequiredMixin):
     @extend_schema_serializer(component_name="CertificateRequestOutput")
     class OutputSerializer(serializers.Serializer):
-        id = serializers.CharField()
+        certificate_id = serializers.CharField()
         display_name = serializers.CharField()
         issued_date = serializers.DateField()
         removal_amount_kg = serializers.IntegerField()
@@ -33,13 +32,13 @@ class CertificateRetrievalView(BaseAPIView, UnauthenticatedMixin, APIKeyRequired
             certificate = certificate_get_by_id(certificate_id=id)
             output = self.OutputSerializer(
                 {
-                    "id": certificate.certificate_id,
+                    "certificate_id": certificate.certificate_id,
                     "display_name": certificate.display_name,
                     "issued_date": certificate.issued_date,
                     "removal_amount_kg": certificate.removal_request.total_kg,
                 }
             )
-            return Response(output.data, status=status.HTTP_200_OK)
+            return response.Response(output.data, status=status.HTTP_200_OK)
         except ObjectDoesNotExist:
             raise exceptions.NotFound(
                 detail="Certificate not found",
