@@ -15,6 +15,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Install poetry
+        run: pipx install poetry
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -22,14 +25,13 @@ jobs:
           cache: 'poetry'
           architecture: 'x64'
 
-      - name: Install poetry
-        run: pipx install poetry
-
       - name: Check poetry setup
         run: poetry run poetry check
 
       - name: Install dependencies
-        run: poetry install
+        run: |
+          poetry env use "3.11"
+          poetry install --no-interaction
 
       - name: Lint
         run: poetry run flake8 .
