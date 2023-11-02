@@ -20,7 +20,7 @@ authors = ["Ewan Jones <ewan@climacrux.com>"]
 license = "Proprietry"
 
 [tool.poetry.dependencies]
-Django = { extras = ["argon2"], version = "^4.2.3" }
+Django = { extras = ["argon2"], version = "^4.2.7" }
 django-allauth = "^0.54.0"
 django-environ = "^0.10.0"
 django-filter = "^22.1"
